@@ -1,0 +1,127 @@
+<meta charset="utf-8">
+<title>Sweep colourways</title>
+<link rel="stylesheet" href="../renderer/style.css">
+<style>
+  /* The derived colours are declared on :root in style.css, so they resolve
+     against the root --body. Redeclare them per cell so each colourway is
+     self-contained. */
+  .cell {
+    --face: color-mix(in srgb, var(--body) 13%, #ffffff);
+    --bezel: color-mix(in srgb, var(--body) 86%, #000000);
+    --ink: color-mix(in srgb, var(--sector) 26%, #4a4a4a);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  html, body { width: auto; height: auto; background: transparent; }
+  body { padding: 44px 44px 30px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 46px 44px;
+    width: max-content;
+  }
+  .holder {
+    position: relative;
+    width: var(--unit);
+    height: calc(var(--unit) * 1.10);
+  }
+  .holder #stage { left: 0; top: 0; }
+  .name {
+    margin-top: 26px;
+    font: 600 16px/1 -apple-system, system-ui, sans-serif;
+    letter-spacing: .02em;
+    color: #8b8b90;          /* mid grey: legible on GitHub's light and dark themes */
+  }
+</style>
+
+<div class="grid" id="grid"></div>
+
+<template id="tpl">
+  <div id="stage" class="mode-full">
+    <div class="nub">
+      <div class="btn-bar"><span class="btn-label">START</span></div>
+      <div class="btn-round"><span class="btn-label">RESET</span></div>
+    </div>
+    <div class="case">
+      <div class="brand">sweep</div>
+      <div class="face-wrap">
+        <svg viewBox="0 0 100 100" class="dial">
+          <circle class="bezel" cx="50" cy="50" r="48.5"/>
+          <circle class="face"  cx="50" cy="50" r="46"/>
+          <g class="ticks"></g>
+          <g class="numbers"></g>
+          <path class="sector" d=""/>
+          <line class="hand" x1="50" y1="50" x2="50" y2="12"/>
+          <g class="quote">
+            <text class="quote-l1" x="50" y="66" text-anchor="middle"></text>
+            <text class="quote-l2" x="50" y="72" text-anchor="middle"></text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script src="../renderer/schemes.js"></script>
+<script src="../renderer/dial.js"></script>
+<script>
+  // Mottos are the ones printed on the reference timers.
+  const CELLS = [
+    { id: 'blush',        minutes: 25, quote: "We're growing all the time." },
+    { id: 'cream-pine',   minutes: 20, quote: 'Great things take time.' },
+    { id: 'lavender',     minutes: 15, quote: 'Becoming a better version of me.' },
+    { id: 'sky',          minutes: 45, quote: 'Small steps, every day.' },
+    { id: 'mustard-navy', minutes: 30, quote: 'One thing at a time.' },
+    { id: 'slate-ember',  minutes: 50, quote: 'Flow with your own rhythm.' }
+  ]
+
+  function splitQuote (text) {
+    const words = text.trim().split(/\s+/)
+    let best = words.length, bestDiff = Infinity
+    for (let i = 1; i <= words.length; i++) {
+      const d = Math.abs(words.slice(0, i).join(' ').length - words.slice(i).join(' ').length)
+      if (d < bestDiff) { bestDiff = d; best = i }
+    }
+    return [words.slice(0, best).join(' '), words.slice(best).join(' ')]
+  }
+
+  const grid = document.getElementById('grid')
+  const tpl = document.getElementById('tpl')
+
+  for (const spec of CELLS) {
+    const s = window.findScheme(spec.id, [])
+
+    const cell = document.createElement('div')
+    cell.className = 'cell'
+    cell.style.setProperty('--unit', '280px')
+    cell.style.setProperty('--body', s.body)
+    cell.style.setProperty('--sector', s.sector)
+    cell.style.setProperty('--knob', s.knob)
+    cell.style.setProperty('--btn', s.btn)
+    cell.style.setProperty('--btn-ink', window.inkFor(s.btn))
+    cell.style.setProperty('--knob-ink', window.inkFor(s.knob))
+
+    const holder = document.createElement('div')
+    holder.className = 'holder'
+    holder.appendChild(tpl.content.cloneNode(true))
+    cell.appendChild(holder)
+
+    const name = document.createElement('div')
+    name.className = 'name'
+    name.textContent = s.name
+    cell.appendChild(name)
+    grid.appendChild(cell)
+
+    Dial.buildTicks(holder.querySelector('.ticks'))
+    Dial.buildNumbers(holder.querySelector('.numbers'))
+    holder.querySelector('.sector').setAttribute('d', Dial.sectorPath(spec.minutes))
+    const [hx, hy] = Dial.polar(spec.minutes * 6, Dial.R_SECTOR)
+    const hand = holder.querySelector('.hand')
+    hand.setAttribute('x2', hx.toFixed(2))
+    hand.setAttribute('y2', hy.toFixed(2))
+    const [l1, l2] = splitQuote(spec.quote)
+    holder.querySelector('.quote-l1').textContent = l1
+    holder.querySelector('.quote-l2').textContent = l2
+  }
+</script>
