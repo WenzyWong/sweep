@@ -57,7 +57,7 @@ renderer/
   i18n.js            五本语言字典与 DOM 翻译器（与主进程共用）
   dial.js            盘面几何：刻度、数字、扇形路径、拖拽角度运算
   timer.js           倒计时状态机
-  chime.js           结束提示音，以 Web Audio 实时合成
+  chime.js           提示音与按键音效，以 Web Audio 实时合成
   app.js             整合层：拖拽、命中测试、绘制、结束处理
   settings.html/js   设置窗口
   history.html/js    记录窗口

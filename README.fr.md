@@ -58,7 +58,7 @@ renderer/
   i18n.js            les cinq dictionnaires et le traducteur DOM (partagés avec le processus principal)
   dial.js            géométrie du cadran : graduations, chiffres, tracé du secteur, angles de glissement
   timer.js           machine à états du compte à rebours
-  chime.js           le carillon de fin, synthétisé avec Web Audio
+  chime.js           le carillon de fin et les sons de boutons, synthétisés avec Web Audio
   app.js             câblage : glissement, détection de zone, rendu, fin de séance
   settings.html/js   la fenêtre de réglages
   history.html/js    la fenêtre d'historique

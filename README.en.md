@@ -58,7 +58,7 @@ renderer/
   i18n.js            the five dictionaries and the DOM translator (shared with the main process)
   dial.js            dial geometry: ticks, numbers, the sector path, drag angles
   timer.js           countdown state machine
-  chime.js           the end-of-timer bell, synthesised with Web Audio
+  chime.js           the bell and the button sounds, synthesised with Web Audio
   app.js             wiring: dragging, hit-testing, rendering, finishing
   settings.html/js   the settings window
   history.html/js    the history window

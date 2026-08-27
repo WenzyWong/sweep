@@ -111,6 +111,7 @@ $('size').addEventListener('input', e => {
 $('quote').addEventListener('input', e => api.setSettings({ quote: e.target.value }))
 $('label').addEventListener('input', e => api.setSettings({ label: e.target.value }))
 $('sound').addEventListener('change', e => api.setSettings({ sound: e.target.checked }))
+$('click-sound').addEventListener('change', e => api.setSettings({ clickSound: e.target.checked }))
 $('notify').addEventListener('change', e => api.setSettings({ notify: e.target.checked }))
 $('idle-fade').addEventListener('change', e => api.setSettings({ idleFade: e.target.checked }))
 $('open-history').addEventListener('click', () => api.openHistory())
@@ -143,6 +144,7 @@ function apply (s) {
   if (document.activeElement !== $('quote')) $('quote').value = s.quote || ''
   if (document.activeElement !== $('label')) $('label').value = s.label || ''
   $('sound').checked = !!s.sound
+  $('click-sound').checked = !!s.clickSound
   $('notify').checked = !!s.notify
   $('idle-fade').checked = !!s.idleFade
 }

@@ -39,6 +39,7 @@ const STRINGS = {
     'appearance.idleFadeHint': '沒在倒數時降到 40% 透明，滑鼠移上去恢復',
     'text.quote': '箴言', 'text.label': '標籤', 'text.labelHint': '機身左上角的小字',
     'alert.sound': '提示音', 'alert.soundHint': '結束時輕響一聲',
+    'alert.click': '按鍵音', 'alert.clickHint': '按下按鈕時的咔嗒聲，重置另有一聲掃過的音',
     'alert.notify': '系統通知', 'alert.notifyHint': '被全螢幕視窗蓋住時也看得到',
     'open.history': '開啟紀錄視窗',
 
@@ -80,6 +81,7 @@ const STRINGS = {
     'appearance.idleFadeHint': '没在倒计时时降到 40% 透明，鼠标移上去恢复',
     'text.quote': '箴言', 'text.label': '标签', 'text.labelHint': '机身左上角的小字',
     'alert.sound': '提示音', 'alert.soundHint': '结束时轻响一声',
+    'alert.click': '按键音', 'alert.clickHint': '按下按钮时的咔嗒声，重置另有一声扫过的音',
     'alert.notify': '系统通知', 'alert.notifyHint': '被全屏窗口盖住时也看得到',
     'open.history': '打开记录窗口',
 
@@ -121,6 +123,7 @@ const STRINGS = {
     'appearance.idleFadeHint': 'カウントダウンしていないときは不透明度 40%、マウスを重ねると元に戻ります',
     'text.quote': '一言', 'text.label': 'ラベル', 'text.labelHint': '本体左上の小さな文字',
     'alert.sound': '通知音', 'alert.soundHint': '終了時に一度だけ柔らかく鳴ります',
+    'alert.click': 'ボタン音', 'alert.clickHint': 'ボタンを押したときのカチッという音。リセットだけは払うような音になります',
     'alert.notify': 'システム通知', 'alert.notifyHint': '全画面ウインドウに隠れていても届きます',
     'open.history': '記録ウインドウを開く',
 
@@ -162,6 +165,7 @@ const STRINGS = {
     'appearance.idleFadeHint': 'Drops to 40% opacity between runs; hover to bring it back',
     'text.quote': 'Motto', 'text.label': 'Label', 'text.labelHint': 'The small word on the case',
     'alert.sound': 'Chime', 'alert.soundHint': 'One soft note when the countdown ends',
+    'alert.click': 'Button clicks', 'alert.clickHint': 'A dry click on press; reset gets a wind-back sweep',
     'alert.notify': 'System notification', 'alert.notifyHint': 'Reaches you even behind a fullscreen window',
     'open.history': 'Open history window',
 
@@ -204,6 +208,7 @@ const STRINGS = {
     'appearance.idleFadeHint': 'Descend à 40 % d’opacité entre deux séances ; survolez pour la rétablir',
     'text.quote': 'Devise', 'text.label': 'Étiquette', 'text.labelHint': 'Le petit mot sur le boîtier',
     'alert.sound': 'Carillon', 'alert.soundHint': 'Une note douce à la fin',
+    'alert.click': 'Clic des boutons', 'alert.clickHint': "Un clic sec à la pression ; la remise à zéro a un son de rembobinage",
     'alert.notify': 'Notification système', 'alert.notifyHint': 'Vous atteint même derrière une fenêtre plein écran',
     'open.history': 'Ouvrir l’historique',
 

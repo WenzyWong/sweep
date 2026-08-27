@@ -136,6 +136,7 @@ timer.addEventListener('finished', async ev => {
 
 againBtn.addEventListener('click', e => {
   e.stopPropagation()
+  press('click')
   stopFlash()
   againBtn.hidden = true
   timer.setMinutes(timer.minutes)
@@ -144,8 +145,15 @@ againBtn.addEventListener('click', e => {
 })
 
 // ---------------------------------------------------------------- controls
+function press (kind) {
+  if (!settings || !settings.clickSound) return
+  if (kind === 'sweep') window.playSweep()
+  else window.playClick()
+}
+
 document.querySelector('.btn-bar').addEventListener('click', e => {
   e.stopPropagation()
+  press('click')
   stopFlash()
   againBtn.hidden = true
   timer.toggle()
@@ -153,6 +161,7 @@ document.querySelector('.btn-bar').addEventListener('click', e => {
 
 document.querySelector('.btn-round').addEventListener('click', e => {
   e.stopPropagation()
+  press('sweep')
   stopFlash()
   againBtn.hidden = true
   timer.reset()
@@ -160,6 +169,7 @@ document.querySelector('.btn-round').addEventListener('click', e => {
 
 document.querySelector('.hub').addEventListener('click', e => {
   e.stopPropagation()
+  press('click')
   stopFlash()
   againBtn.hidden = true
   timer.toggle()

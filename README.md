@@ -57,7 +57,7 @@ renderer/
   i18n.js            五本語言字典與 DOM 翻譯器（與主行程共用）
   dial.js            盤面幾何：刻度、數字、扇形路徑、拖曳角度運算
   timer.js           倒數狀態機
-  chime.js           結束提示音，以 Web Audio 即時合成
+  chime.js           提示音與按鍵音效，以 Web Audio 即時合成
   app.js             整合層：拖曳、命中測試、繪製、結束處理
   settings.html/js   設定視窗
   history.html/js    紀錄視窗

@@ -58,7 +58,7 @@ renderer/
   i18n.js            5 言語の辞書と DOM 翻訳器（メインプロセスと共有）
   dial.js            文字盤の幾何：目盛り、数字、扇形パス、ドラッグ角度の計算
   timer.js           カウントダウンの状態機械
-  chime.js           終了音。Web Audio でその場で合成
+  chime.js           終了音とボタン音。Web Audio でその場で合成
   app.js             配線：ドラッグ、当たり判定、描画、終了処理
   settings.html/js   設定ウインドウ
   history.html/js    記録ウインドウ
