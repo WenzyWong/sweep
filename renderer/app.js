@@ -56,6 +56,8 @@ function applySettings (s) {
   root.setProperty('--knob', sc.knob)
   root.setProperty('--btn', sc.btn)
   root.setProperty('--unit', s.sizeUnit + 'px')
+  root.setProperty('--op-active', String(s.opacity))
+  root.setProperty('--op-idle', String(s.idleFade ? s.idleOpacity : s.opacity))
   root.setProperty('--btn-ink', window.inkFor(sc.btn))
   root.setProperty('--knob-ink', window.inkFor(sc.knob))
 
@@ -138,13 +140,19 @@ againBtn.addEventListener('click', e => {
   e.stopPropagation()
   press('click')
   stopFlash()
-  againBtn.hidden = true
+  dismissAgain()
   timer.setMinutes(timer.minutes)
   timer.reset()
   timer.start()
 })
 
 // ---------------------------------------------------------------- controls
+// The replay button offers "another N minutes" for the run that just ended.
+// Touching the dial makes that offer stale, so it goes away.
+function dismissAgain () {
+  againBtn.hidden = true
+}
+
 function press (kind) {
   if (!settings || !settings.clickSound) return
   if (kind === 'sweep') window.playSweep()
@@ -155,7 +163,7 @@ document.querySelector('.btn-bar').addEventListener('click', e => {
   e.stopPropagation()
   press('click')
   stopFlash()
-  againBtn.hidden = true
+  dismissAgain()
   timer.toggle()
 })
 
@@ -163,16 +171,39 @@ document.querySelector('.btn-round').addEventListener('click', e => {
   e.stopPropagation()
   press('sweep')
   stopFlash()
-  againBtn.hidden = true
+  dismissAgain()
   timer.reset()
 })
 
-document.querySelector('.hub').addEventListener('click', e => {
-  e.stopPropagation()
+const hub = document.querySelector('.hub')
+let hubClickTimer = null
+
+function hubToggle () {
   press('click')
   stopFlash()
-  againBtn.hidden = true
+  dismissAgain()
   timer.toggle()
+}
+
+hub.addEventListener('click', e => {
+  e.stopPropagation()
+  // In full-body mode the round button on top already resets, so the knob can
+  // act at once. In bare-dial mode it has to carry both actions, which means
+  // waiting long enough to see whether a second click is coming.
+  if (!settings || settings.mode !== 'dial') { hubToggle(); return }
+  if (hubClickTimer) return
+  hubClickTimer = setTimeout(() => { hubClickTimer = null; hubToggle() }, 220)
+})
+
+hub.addEventListener('dblclick', e => {
+  e.stopPropagation()
+  if (!settings || settings.mode !== 'dial') return
+  clearTimeout(hubClickTimer)
+  hubClickTimer = null
+  press('sweep')
+  stopFlash()
+  dismissAgain()
+  timer.reset()
 })
 
 // ---------------------------------------------------------------- dragging
@@ -190,6 +221,7 @@ stage.addEventListener('mousedown', e => {
   const onFace = dist <= 0.40 * rect.width && dist > 0.095 * rect.width
 
   if (!e.metaKey && onFace) {
+    dismissAgain()
     drag = { type: 'dial', rect, lastAngle: Dial.pointerAngle(e, rect), acc: timer.displayMinutes }
   } else {
     drag = { type: 'window', sx: e.screenX, sy: e.screenY }
@@ -224,7 +256,7 @@ window.addEventListener('mouseup', () => {
 
 // ---------------------------------------------------------------- typing a duration
 faceWrap.addEventListener('dblclick', e => {
-  if (e.target.closest('.again')) return
+  if (e.target.closest('.again, .hub')) return
   minuteInput.value = timer.minutes
   minuteInput.hidden = false
   minuteInput.focus()
@@ -234,6 +266,7 @@ faceWrap.addEventListener('dblclick', e => {
 function commitInput () {
   const v = parseInt(minuteInput.value, 10)
   if (Number.isFinite(v)) {
+    dismissAgain()
     timer.setMinutes(v)
     if (timer.state !== 'running') timer.reset()
     rememberMinutes()
@@ -266,8 +299,16 @@ function updateHitTest (e) {
   if (over !== lastOver) {
     lastOver = over
     api.setIgnoreMouse(!over)
+    document.body.classList.toggle('hot', over)
   }
 }
+
+// If the window loses focus the pointer is certainly elsewhere, and no further
+// mousemove is coming to tell us so.
+window.addEventListener('blur', () => {
+  lastOver = false
+  document.body.classList.remove('hot')
+})
 
 // ---------------------------------------------------------------- menu
 window.addEventListener('contextmenu', e => {

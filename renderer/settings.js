@@ -108,6 +108,16 @@ $('size').addEventListener('input', e => {
   api.setSettings({ sizeUnit: v })
 })
 
+function bindOpacity (id, labelId, key) {
+  $(id).addEventListener('input', e => {
+    const pct = parseInt(e.target.value, 10)
+    $(labelId).textContent = pct + '%'
+    api.setSettings({ [key]: pct / 100 })
+  })
+}
+bindOpacity('opacity', 'opacity-label', 'opacity')
+bindOpacity('idle-opacity', 'idle-opacity-label', 'idleOpacity')
+
 $('quote').addEventListener('input', e => api.setSettings({ quote: e.target.value }))
 $('label').addEventListener('input', e => api.setSettings({ label: e.target.value }))
 $('sound').addEventListener('change', e => api.setSettings({ sound: e.target.checked }))
@@ -147,6 +157,15 @@ function apply (s) {
   $('click-sound').checked = !!s.clickSound
   $('notify').checked = !!s.notify
   $('idle-fade').checked = !!s.idleFade
+
+  for (const [id, labelId, value] of [['opacity', 'opacity-label', s.opacity],
+                                      ['idle-opacity', 'idle-opacity-label', s.idleOpacity]]) {
+    const pct = Math.round(value * 100)
+    if (document.activeElement !== $(id)) $(id).value = pct
+    $(labelId).textContent = pct + '%'
+  }
+  // the idle slider means nothing when idle fading is switched off
+  $('idle-opacity').disabled = !s.idleFade
 }
 
 api.onSettingsChanged(apply)

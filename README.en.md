@@ -12,6 +12,8 @@ a colour sector sweeps back to zero, and the face flashes when time is up.
 - Six colourways from the reference timer, plus fully custom four-colour schemes
 - Set the time by dragging the dial or by typing minutes (1–60)
 - Every completed run is logged; the history window shows the day's rings and the last 30 days
+- Adjustable opacity, set separately for running and idle; hovering always brings it back to solid
+- Buttons click, reset sweeps, and a soft note marks the end
 - Traditional Chinese, Simplified Chinese, Japanese, English and French, picked up from the system locale on first launch
 
 ## Installing
@@ -39,7 +41,7 @@ npm start
 | Set the time | Drag inside the dial — clockwise adds, anticlockwise subtracts |
 | Type a time | Double-click the dial, enter 1–60, press Enter |
 | Start / pause | Click the centre knob, or the bar button on top |
-| Reset | Click the round button on top |
+| Reset | Click the round button on top; in bare-dial mode, double-click the centre knob |
 | Move it | Drag the case or the dial's outer ring, or ⌘-drag anywhere |
 | Everything else | Right-click: mode, size, colours, language, history, settings, quit |
 

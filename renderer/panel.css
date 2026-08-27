@@ -185,3 +185,12 @@ select {
   padding: 5px 8px;
   outline: none;
 }
+
+.pct {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+  min-width: 34px;
+  text-align: right;
+}
+input[type="range"]:disabled { opacity: .4; }

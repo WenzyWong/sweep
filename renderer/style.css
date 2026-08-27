@@ -1,6 +1,8 @@
 :root {
   --pad: 18px;
   --unit: 200px;
+  --op-active: 1;
+  --op-idle: .4;
   --nub: calc(var(--unit) * 0.10);
 
   --body: #F2D3D3;
@@ -31,13 +33,19 @@ html, body {
   left: var(--pad);
   top: var(--pad);
   width: var(--unit);
+  opacity: var(--op-active);
   transition: opacity .35s ease;
   filter: drop-shadow(0 6px 14px rgba(0,0,0,.20)) drop-shadow(0 1px 3px rgba(0,0,0,.12));
 }
 
-/* idle and unhovered: sit back and stay out of the way */
-body.fade #stage { opacity: .4; }
-body.fade #stage:hover { opacity: 1; }
+/* idle and untouched: sit back and stay out of the way. `.hot` is set by the
+   hit test in app.js rather than by :hover, which does not update reliably on
+   a window that keeps toggling setIgnoreMouseEvents. */
+body.fade #stage { opacity: var(--op-idle); }
+
+/* Pointer over it: always fully solid, whatever the two settings say. This
+   rule comes last so it wins over both of the above. */
+body.hot #stage { opacity: 1; }
 
 /* ------------------------------------------------------------ top buttons */
 .nub { position: relative; height: var(--nub); }
@@ -162,8 +170,8 @@ body.tiny .btn-round { padding: 0; width: var(--nub); }
   transition: opacity .2s ease;
 }
 .quote { transition: opacity .2s ease; }
-#stage:hover .quote { opacity: 0; }
-#stage:hover .readout { opacity: .85; }
+body.hot .quote { opacity: 0; }
+body.hot .readout { opacity: .85; }
 
 /* at small sizes the numbers turn to mush, so drop them */
 body.compact .num { display: none; }

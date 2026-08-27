@@ -12,6 +12,8 @@ un secteur coloré revient vers zéro, et le cadran clignote quand le temps est 
 - Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs
 - Réglez la durée en faisant tourner le cadran ou en saisissant les minutes (1–60)
 - Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours
+- Opacité réglable séparément pendant une séance et au repos ; le survol la ramène toujours à l'opacité pleine
+- Les boutons cliquent, la remise à zéro balaie, et une note douce marque la fin
 - Chinois traditionnel, chinois simplifié, japonais, anglais et français, choisis d'après la langue du système au premier lancement
 
 ## Installation
@@ -39,7 +41,7 @@ npm start
 | Régler la durée | Faites glisser dans le cadran — sens horaire pour ajouter, antihoraire pour retirer |
 | Saisir une durée | Double-cliquez sur le cadran, entrez 1–60, appuyez sur Entrée |
 | Démarrer / pause | Cliquez sur le bouton central, ou sur la barre en haut |
-| Remettre à zéro | Cliquez sur le bouton rond en haut |
+| Remettre à zéro | Cliquez sur le bouton rond en haut ; en mode cadran seul, double-cliquez sur le bouton central |
 | Déplacer | Faites glisser le boîtier ou la couronne graduée, ou ⌘-glissez n'importe où |
 | Tout le reste | Clic droit : mode, taille, couleurs, langue, historique, réglages, quitter |
 

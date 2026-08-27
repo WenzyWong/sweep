@@ -20,6 +20,8 @@ const DEFAULTS = {
   clickSound: true,
   notify: true,
   idleFade: true,
+  opacity: 1,
+  idleOpacity: 0.4,
   lastMinutes: 25,
   bounds: null
 }
