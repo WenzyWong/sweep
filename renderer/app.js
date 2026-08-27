@@ -16,8 +16,9 @@ const minuteInput = document.querySelector('.minute-input')
 const againBtn = document.querySelector('.again')
 const btnBar = document.querySelector('.btn-bar')
 const btnRound = document.querySelector('.btn-round')
-const lblToggle = document.getElementById('lbl-toggle')
-const lblReset = document.getElementById('lbl-reset')
+const tip = document.getElementById('tip')
+const tipMain = tip.querySelector('.tip-main')
+const tipHint = tip.querySelector('.tip-hint')
 
 const L = (key, vars) => window.t(settings ? settings.lang : 'en', key, vars)
 
@@ -58,8 +59,6 @@ function applySettings (s) {
   root.setProperty('--unit', s.sizeUnit + 'px')
   root.setProperty('--op-active', String(s.opacity))
   root.setProperty('--op-idle', String(s.idleFade ? s.idleOpacity : s.opacity))
-  root.setProperty('--btn-ink', window.inkFor(sc.btn))
-  root.setProperty('--knob-ink', window.inkFor(sc.knob))
 
   stage.className = 'mode-' + s.mode + (stage.classList.contains('flashing') ? ' flashing' : '')
   document.body.classList.toggle('compact', s.sizeUnit < 165)
@@ -79,12 +78,40 @@ function applySettings (s) {
   render()
 }
 
-// Captions, tooltips and the replay button all come from the dictionary.
+// The replay button and the tooltip both come from the dictionary.
 function applyI18n () {
-  lblReset.textContent = L('btn.reset')
-  btnBar.title = L('tip.startPause')
-  btnRound.title = L('tip.reset')
   if (!againBtn.hidden) againBtn.textContent = L('again', { m: timer.minutes })
+  if (tipFor) renderTip()
+}
+
+// ---------------------------------------------------------------- tooltip
+// The controls carry no lettering — at 140px a caption is unreadable anyway.
+// Hovering one names it instead, in a pill near the top of the dial.
+let tipFor = null
+let tipHideTimer = null
+
+function renderTip () {
+  tipMain.textContent = tipFor === 'reset'
+    ? L('btn.reset')
+    : L(timer.state === 'running' ? 'btn.pause' : 'btn.start')
+  // only the bare-dial knob carries a second gesture worth explaining
+  tipHint.textContent = tipFor === 'knob' ? L('tip.knobHint') : ''
+  tipHint.hidden = tipFor !== 'knob'
+}
+
+function showTip (which) {
+  tipFor = which
+  clearTimeout(tipHideTimer)
+  renderTip()
+  tip.hidden = false
+  requestAnimationFrame(() => tip.classList.add('show'))
+}
+
+function hideTip () {
+  tipFor = null
+  tip.classList.remove('show')
+  clearTimeout(tipHideTimer)
+  tipHideTimer = setTimeout(() => { tip.hidden = true }, 200)
 }
 
 let persistMinutes = null
@@ -109,7 +136,7 @@ function render () {
   hand.setAttribute('y2', hy.toFixed(2))
   hand.style.opacity = dm > 0.02 ? '1' : '0'
   readout.textContent = fmt(timer.state === 'idle' ? timer.minutes * 60000 : timer.remainingMs)
-  lblToggle.textContent = L(timer.state === 'running' ? 'btn.pause' : 'btn.start')
+  if (tipFor) renderTip()
   document.body.classList.toggle('fade', !!settings && settings.idleFade && timer.state === 'idle')
 }
 
@@ -194,6 +221,13 @@ hub.addEventListener('click', e => {
   if (hubClickTimer) return
   hubClickTimer = setTimeout(() => { hubClickTimer = null; hubToggle() }, 220)
 })
+
+// hover -> name the control
+btnBar.addEventListener('mouseenter', () => showTip('toggle'))
+btnRound.addEventListener('mouseenter', () => showTip('reset'))
+hub.addEventListener('mouseenter', () =>
+  showTip(settings && settings.mode === 'dial' ? 'knob' : 'toggle'))
+for (const el of [btnBar, btnRound, hub]) el.addEventListener('mouseleave', hideTip)
 
 hub.addEventListener('dblclick', e => {
   e.stopPropagation()
@@ -300,6 +334,7 @@ function updateHitTest (e) {
     lastOver = over
     api.setIgnoreMouse(!over)
     document.body.classList.toggle('hot', over)
+    if (!over) hideTip()
   }
 }
 
@@ -308,6 +343,7 @@ function updateHitTest (e) {
 window.addEventListener('blur', () => {
   lastOver = false
   document.body.classList.remove('hot')
+  hideTip()
 })
 
 // ---------------------------------------------------------------- menu

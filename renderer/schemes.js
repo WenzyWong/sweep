@@ -17,25 +17,3 @@ function findScheme (id, custom) {
 if (typeof module !== 'undefined' && module.exports) module.exports = { PRESETS, findScheme }
 if (typeof window !== 'undefined') { window.PRESETS = PRESETS; window.findScheme = findScheme }
 
-function hexToRgb (hex) {
-  const h = String(hex).replace('#', '')
-  const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16)
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-}
-
-function relLuminance (hex) {
-  const [r, g, b] = hexToRgb(hex).map(v => {
-    const s = v / 255
-    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)
-  })
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-
-// Button captions are white, as designed — but a few colourways use very pale
-// buttons, where white would vanish. Those fall back to a soft dark ink.
-function inkFor (hex) {
-  return relLuminance(hex) > 0.45 ? 'rgba(0,0,0,.5)' : 'rgba(255,255,255,.85)'
-}
-
-if (typeof module !== 'undefined' && module.exports) Object.assign(module.exports, { hexToRgb, relLuminance, inkFor })
-if (typeof window !== 'undefined') Object.assign(window, { hexToRgb, relLuminance, inkFor })

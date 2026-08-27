@@ -62,35 +62,57 @@ body.hot #stage { opacity: 1; }
 }
 .btn-bar {
   left: 16%;
-  width: 34%;
+  width: 38%;
   height: 100%;
   border-radius: calc(var(--unit) * 0.02) calc(var(--unit) * 0.02) 0 0;
 }
-/* wide enough for its caption, but never narrower than a round button */
 .btn-round {
   right: 14%;
-  min-width: var(--nub);
+  width: var(--nub);
   height: var(--nub);
-  padding: 0 calc(var(--unit) * 0.028);
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--knob);
 }
 
-.btn-label {
-  font-size: calc(var(--unit) * 0.042);
-  font-weight: 700;
-  letter-spacing: .09em;
-  white-space: nowrap;
+/* A single tooltip, shown near the top of the dial while a control is hovered.
+   Dark and self-coloured so it stays legible over every colourway. */
+.tip {
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  transform: translate(-50%, -4px);
+  z-index: 5;
+  padding: calc(var(--unit) * 0.022) calc(var(--unit) * 0.055);
+  border-radius: 999px;
+  background: rgba(28, 28, 30, .9);
+  color: rgba(255, 255, 255, .94);
+  font-size: calc(var(--unit) * 0.055);
+  font-weight: 500;
+  /* the knob's caption names two gestures, so it has to be allowed to wrap
+     rather than run off the edge of a 236px window */
+  max-width: 86%;
+  text-align: center;
+  line-height: 1.4;
   pointer-events: none;
-  opacity: .78;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+  opacity: 0;
+  transition: opacity .14s ease, transform .14s ease;
 }
-.btn-bar .btn-label { color: var(--btn-ink, rgba(255,255,255,.85)); }
-.btn-round .btn-label { color: var(--knob-ink, rgba(255,255,255,.85)); }
+.tip-main { display: block; }
+.tip-hint {
+  display: block;
+  font-size: .8em;
+  font-weight: 400;
+  opacity: .62;
+  margin-top: .2em;
+}
 
-/* below roughly 120px the captions turn to fuzz, so let the shapes speak */
-body.tiny .btn-label { display: none; }
-body.tiny .btn-round { padding: 0; width: var(--nub); }
-.btn-bar:active, .btn-round:active { transform: translateY(6%); filter: brightness(.94); }
+.tip.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+#stage.mode-dial .tip { top: 12%; }
+body.tiny .tip { display: none; }
 
 /* ------------------------------------------------------------ case */
 .case {

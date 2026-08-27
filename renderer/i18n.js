@@ -14,7 +14,7 @@ const STRINGS = {
     'win.history': 'Sweep — 紀錄',
 
     'btn.start': '開始', 'btn.pause': '暫停', 'btn.reset': '重置',
-    'tip.startPause': '開始 / 暫停', 'tip.reset': '重置',
+    'tip.knobHint': '雙擊重置',
     'again': '↻ 再 {m} 分鐘',
 
     'notify.title': '倒數結束',
@@ -58,7 +58,7 @@ const STRINGS = {
     'win.history': 'Sweep — 记录',
 
     'btn.start': '开始', 'btn.pause': '暂停', 'btn.reset': '重置',
-    'tip.startPause': '开始 / 暂停', 'tip.reset': '重置',
+    'tip.knobHint': '双击重置',
     'again': '↻ 再 {m} 分钟',
 
     'notify.title': '倒计时结束',
@@ -102,7 +102,7 @@ const STRINGS = {
     'win.history': 'Sweep — 記録',
 
     'btn.start': '開始', 'btn.pause': '一時停止', 'btn.reset': 'リセット',
-    'tip.startPause': '開始 / 一時停止', 'tip.reset': 'リセット',
+    'tip.knobHint': 'ダブルクリックでリセット',
     'again': '↻ もう {m} 分',
 
     'notify.title': '時間になりました',
@@ -145,8 +145,8 @@ const STRINGS = {
     'win.settings': 'Sweep — Settings',
     'win.history': 'Sweep — History',
 
-    'btn.start': 'START', 'btn.pause': 'PAUSE', 'btn.reset': 'RESET',
-    'tip.startPause': 'Start / pause', 'tip.reset': 'Reset',
+    'btn.start': 'Start', 'btn.pause': 'Pause', 'btn.reset': 'Reset',
+    'tip.knobHint': 'Double-click to reset',
     'again': '↻ Another {m} min',
 
     'notify.title': "Time's up",
@@ -190,8 +190,8 @@ const STRINGS = {
     'win.settings': 'Sweep — Réglages',
     'win.history': 'Sweep — Historique',
 
-    'btn.start': 'DÉPART', 'btn.pause': 'PAUSE', 'btn.reset': 'RAZ',
-    'tip.startPause': 'Démarrer / mettre en pause', 'tip.reset': 'Remettre à zéro',
+    'btn.start': 'Démarrer', 'btn.pause': 'Pause', 'btn.reset': 'Remettre à zéro',
+    'tip.knobHint': 'Double-clic : remise à zéro',
     'again': '↻ Encore {m} min',
 
     'notify.title': 'Temps écoulé',

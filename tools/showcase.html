@@ -40,8 +40,8 @@
 <template id="tpl">
   <div id="stage" class="mode-full">
     <div class="nub">
-      <div class="btn-bar"><span class="btn-label">START</span></div>
-      <div class="btn-round"><span class="btn-label">RESET</span></div>
+      <div class="btn-bar"></div>
+      <div class="btn-round"></div>
     </div>
     <div class="case">
       <div class="brand">Sweep</div>
@@ -99,8 +99,6 @@
     cell.style.setProperty('--sector', s.sector)
     cell.style.setProperty('--knob', s.knob)
     cell.style.setProperty('--btn', s.btn)
-    cell.style.setProperty('--btn-ink', window.inkFor(s.btn))
-    cell.style.setProperty('--knob-ink', window.inkFor(s.knob))
 
     const holder = document.createElement('div')
     holder.className = 'holder'
