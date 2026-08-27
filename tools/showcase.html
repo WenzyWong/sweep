@@ -6,6 +6,8 @@
      against the root --body. Redeclare them per cell so each colourway is
      self-contained. */
   .cell {
+    --nub: calc(var(--unit) * 0.10);
+    --tip-space: calc(var(--unit) * 0.26);
     --face: color-mix(in srgb, var(--body) 13%, #ffffff);
     --bezel: color-mix(in srgb, var(--body) 86%, #000000);
     --ink: color-mix(in srgb, var(--sector) 26%, #4a4a4a);
@@ -57,6 +59,8 @@
             <text class="quote-l1" x="50" y="66" text-anchor="middle"></text>
             <text class="quote-l2" x="50" y="72" text-anchor="middle"></text>
           </g>
+          <circle class="hub-ring" cx="50" cy="50" r="8.5"/>
+          <circle class="hub" cx="50" cy="50" r="7"/>
         </svg>
       </div>
     </div>
