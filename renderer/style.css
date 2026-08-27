@@ -1,6 +1,7 @@
 :root {
   --pad: 18px;
   --unit: 200px;
+  --tip-space: calc(var(--unit) * 0.26);
   --op-active: 1;
   --op-idle: .4;
   --nub: calc(var(--unit) * 0.10);
@@ -31,7 +32,7 @@ html, body {
 #stage {
   position: absolute;
   left: var(--pad);
-  top: var(--pad);
+  top: var(--tip-space);
   width: var(--unit);
   opacity: var(--op-active);
   transition: opacity .35s ease;
@@ -74,44 +75,60 @@ body.hot #stage { opacity: 1; }
   background: var(--knob);
 }
 
-/* A single tooltip, shown near the top of the dial while a control is hovered.
-   Dark and self-coloured so it stays legible over every colourway. */
+/* A single tooltip, floating in the strip above the widget so it never covers
+   the dial. It is a sibling of #stage, not a child, so the stage's opacity and
+   drop shadow do not apply to it. Its colour is the scheme's sector, darkened
+   far enough that white text reads on any of them, custom ones included. */
 .tip {
+  --tip-bg: color-mix(in srgb, var(--sector) 70%, #14141a);
+  --caret: calc(var(--unit) * 0.032);
   position: absolute;
-  left: 50%;
-  top: 15%;
-  transform: translate(-50%, -4px);
+  left: 0;
+  bottom: calc(100% - var(--tip-space) + var(--caret));
   z-index: 5;
-  padding: calc(var(--unit) * 0.022) calc(var(--unit) * 0.055);
-  border-radius: 999px;
-  background: rgba(28, 28, 30, .9);
-  color: rgba(255, 255, 255, .94);
+  padding: calc(var(--unit) * 0.026) calc(var(--unit) * 0.055);
+  border-radius: calc(var(--unit) * 0.045);
+  background: var(--tip-bg);
+  color: rgba(255, 255, 255, .95);
   font-size: calc(var(--unit) * 0.055);
   font-weight: 500;
-  /* the knob's caption names two gestures, so it has to be allowed to wrap
-     rather than run off the edge of a 236px window */
-  max-width: 86%;
+  max-width: calc(var(--unit) + var(--pad));
   text-align: center;
   line-height: 1.4;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
   opacity: 0;
+  transform: translateY(-4px);
   transition: opacity .14s ease, transform .14s ease;
 }
+
+/* the little downward point, sitting under the caption and aimed at whichever
+   control is being hovered */
+.tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: var(--caret-x, 50%);
+  transform: translateX(-50%);
+  border: var(--caret) solid transparent;
+  border-top-color: var(--tip-bg);
+  border-bottom: 0;
+}
+
 .tip-main { display: block; }
 .tip-hint {
   display: block;
   font-size: .8em;
   font-weight: 400;
-  opacity: .62;
+  opacity: .72;
   margin-top: .2em;
 }
 
 .tip.show {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: translateY(0);
 }
-#stage.mode-dial .tip { top: 12%; }
+
 body.tiny .tip { display: none; }
 
 /* ------------------------------------------------------------ case */

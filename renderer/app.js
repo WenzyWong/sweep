@@ -3,6 +3,7 @@
 // see-through desktop.
 const PAD = 18
 const NUB_RATIO = 0.10
+const TIP_RATIO = 0.26
 
 const stage = document.getElementById('stage')
 const faceWrap = document.querySelector('.face-wrap')
@@ -99,11 +100,25 @@ function renderTip () {
   tipHint.hidden = tipFor !== 'knob'
 }
 
-function showTip (which) {
+// Centre the pill on the control being hovered, keep it inside the window,
+// and aim the caret at the control even when the pill had to be nudged over.
+function positionTip (el) {
+  const r = el.getBoundingClientRect()
+  const targetX = r.left + r.width / 2
+  tip.style.left = '0px'
+  const w = tip.offsetWidth
+  const margin = 4
+  const x = Math.max(margin, Math.min(targetX - w / 2, window.innerWidth - w - margin))
+  tip.style.left = x.toFixed(1) + 'px'
+  tip.style.setProperty('--caret-x', (targetX - x).toFixed(1) + 'px')
+}
+
+function showTip (which, el) {
   tipFor = which
   clearTimeout(tipHideTimer)
   renderTip()
   tip.hidden = false
+  positionTip(el)
   requestAnimationFrame(() => tip.classList.add('show'))
 }
 
@@ -223,10 +238,10 @@ hub.addEventListener('click', e => {
 })
 
 // hover -> name the control
-btnBar.addEventListener('mouseenter', () => showTip('toggle'))
-btnRound.addEventListener('mouseenter', () => showTip('reset'))
+btnBar.addEventListener('mouseenter', () => showTip('toggle', btnBar))
+btnRound.addEventListener('mouseenter', () => showTip('reset', btnRound))
 hub.addEventListener('mouseenter', () =>
-  showTip(settings && settings.mode === 'dial' ? 'knob' : 'toggle'))
+  showTip(settings && settings.mode === 'dial' ? 'knob' : 'toggle', hub))
 for (const el of [btnBar, btnRound, hub]) el.addEventListener('mouseleave', hideTip)
 
 hub.addEventListener('dblclick', e => {
@@ -321,14 +336,15 @@ let lastOver = null
 function updateHitTest (e) {
   if (!settings) return
   const unit = settings.sizeUnit
+  const top = Math.round(unit * TIP_RATIO)   // reserved tooltip strip
   let over
   if (settings.mode === 'dial') {
     const cx = window.innerWidth / 2
-    const cy = window.innerHeight / 2
+    const cy = top + unit / 2
     over = Math.hypot(e.clientX - cx, e.clientY - cy) <= unit / 2 + 2
   } else {
     over = e.clientX >= PAD - 2 && e.clientX <= PAD + unit + 2 &&
-           e.clientY >= PAD - 2 && e.clientY <= PAD + unit + unit * NUB_RATIO + 2
+           e.clientY >= top - 2 && e.clientY <= top + unit * NUB_RATIO + unit + 2
   }
   if (over !== lastOver) {
     lastOver = over

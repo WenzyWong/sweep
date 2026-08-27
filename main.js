@@ -6,6 +6,7 @@ const { LANGS, t, detectLang } = require('./renderer/i18n.js')
 // ---------------------------------------------------------------- constants
 const PAD = 18          // transparent margin around the body, room for CSS shadow
 const NUB_RATIO = 0.10  // height of the top button strip, as a fraction of unit
+const TIP_RATIO = 0.26  // reserved strip above the widget for the hover tooltip
 const SIZE_PRESETS = { small: 140, medium: 200, large: 280, xlarge: 380 }
 
 const DEFAULTS = {
@@ -82,12 +83,15 @@ let timerWin = null
 let settingsWin = null
 let historyWin = null
 
+// The tooltip sits above the widget rather than over the dial, so the window
+// carries a taller transparent strip on top than it does anywhere else.
 function winSize (mode, unit) {
-  const w = Math.round(unit + PAD * 2)
-  const h = mode === 'full'
-    ? Math.round(unit + unit * NUB_RATIO + PAD * 2)
-    : w
-  return { width: w, height: h }
+  const tip = Math.round(unit * TIP_RATIO)
+  const body = mode === 'full' ? unit + unit * NUB_RATIO : unit
+  return {
+    width: Math.round(unit + PAD * 2),
+    height: Math.round(tip + body + PAD)
+  }
 }
 
 function createTimerWindow () {
