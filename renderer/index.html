@@ -1,0 +1,42 @@
+<meta charset="utf-8">
+<title>Sweep</title>
+<link rel="stylesheet" href="style.css">
+
+<div id="stage" class="mode-full">
+  <div class="nub">
+    <div class="btn-bar" data-act="toggle"><span class="btn-label" id="lbl-toggle"></span></div>
+    <div class="btn-round" data-act="reset"><span class="btn-label" id="lbl-reset"></span></div>
+  </div>
+
+  <div class="case">
+    <div class="brand"></div>
+
+    <div class="face-wrap">
+      <svg viewBox="0 0 100 100" class="dial">
+        <circle class="bezel" cx="50" cy="50" r="48.5"/>
+        <circle class="face"  cx="50" cy="50" r="46"/>
+        <g class="ticks"></g>
+        <g class="numbers"></g>
+        <path class="sector" d=""/>
+        <line class="hand" x1="50" y1="50" x2="50" y2="12"/>
+        <g class="quote">
+          <text class="quote-l1" x="50" y="66" text-anchor="middle">One thing</text>
+          <text class="quote-l2" x="50" y="72" text-anchor="middle">at a time.</text>
+        </g>
+        <text class="readout" x="50" y="69" text-anchor="middle">25:00</text>
+        <circle class="hub-ring" cx="50" cy="50" r="8.5"/>
+        <circle class="hub" cx="50" cy="50" r="7"/>
+      </svg>
+
+      <input class="minute-input" type="number" min="1" max="60" step="1" hidden>
+      <button class="again" hidden></button>
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="schemes.js"></script>
+<script src="dial.js"></script>
+<script src="chime.js"></script>
+<script src="timer.js"></script>
+<script src="app.js"></script>

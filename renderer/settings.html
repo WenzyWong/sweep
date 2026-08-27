@@ -1,0 +1,70 @@
+<meta charset="utf-8">
+<title>Sweep</title>
+<link rel="stylesheet" href="panel.css">
+<div class="titlebar-drag"></div>
+
+<h1 data-i18n="settings.title"></h1>
+
+<section>
+  <h2 data-i18n="sec.language"></h2>
+  <div class="row">
+    <select id="lang" style="flex:1"></select>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="sec.schemes"></h2>
+  <div class="schemes" id="schemes"></div>
+</section>
+
+<section>
+  <h2 data-i18n="sec.custom"></h2>
+  <div class="row"><label data-i18n="color.body"></label><input type="color" id="c-body"></div>
+  <div class="row"><label data-i18n="color.sector"></label><input type="color" id="c-sector"></div>
+  <div class="row"><label data-i18n="color.knob"></label><input type="color" id="c-knob"></div>
+  <div class="row"><label data-i18n="color.btn"></label><input type="color" id="c-btn"></div>
+  <div id="contrast" class="warn" hidden></div>
+  <div class="row" style="padding-top:12px">
+    <input type="text" id="scheme-name" data-i18n-ph="scheme.name" style="flex:1">
+    <button class="primary" id="save-scheme" data-i18n="scheme.save"></button>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="sec.appearance"></h2>
+  <div class="row">
+    <label data-i18n="appearance.mode"></label>
+    <button id="mode-toggle"></button>
+  </div>
+  <div class="row">
+    <label><span data-i18n="appearance.size"></span><span class="hint" id="size-label"></span></label>
+    <input type="range" id="size" min="90" max="420" step="2">
+  </div>
+  <div class="row">
+    <label><span data-i18n="appearance.idleFade"></span><span class="hint" data-i18n="appearance.idleFadeHint"></span></label>
+    <input type="checkbox" id="idle-fade">
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="sec.faceText"></h2>
+  <div class="row"><label data-i18n="text.quote"></label><input type="text" id="quote" style="flex:1.4"></div>
+  <div class="row">
+    <label><span data-i18n="text.label"></span><span class="hint" data-i18n="text.labelHint"></span></label>
+    <input type="text" id="label" style="width:110px">
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="sec.alert"></h2>
+  <div class="row"><label><span data-i18n="alert.sound"></span><span class="hint" data-i18n="alert.soundHint"></span></label><input type="checkbox" id="sound"></div>
+  <div class="row"><label><span data-i18n="alert.notify"></span><span class="hint" data-i18n="alert.notifyHint"></span></label><input type="checkbox" id="notify"></div>
+</section>
+
+<section>
+  <div class="row"><button id="open-history" data-i18n="open.history"></button></div>
+</section>
+
+<script src="i18n.js"></script>
+<script src="schemes.js"></script>
+<script src="settings.js"></script>

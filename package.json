@@ -1,0 +1,42 @@
+{
+  "name": "sweep",
+  "productName": "Sweep",
+  "version": "1.0.0",
+  "description": "A floating study countdown for macOS, modelled on the physical dial timer",
+  "main": "main.js",
+  "author": "castalia",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.castalia.sweep",
+    "productName": "Sweep",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "identity": null,
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    }
+  }
+}
