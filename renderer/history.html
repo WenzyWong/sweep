@@ -1,0 +1,29 @@
+<meta charset="utf-8">
+<title>Sweep</title>
+<link rel="stylesheet" href="panel.css">
+<div class="titlebar-drag"></div>
+
+<div class="daynav">
+  <button id="prev" data-i18n-title="nav.prev">◀</button>
+  <span class="date" id="date"></span>
+  <button id="next" data-i18n-title="nav.next">▶</button>
+  <span class="spacer"></span>
+  <button id="today" data-i18n="nav.today"></button>
+</div>
+<div class="summary" id="summary"></div>
+
+<section>
+  <div id="rings" class="rings"></div>
+  <div id="empty" class="empty" hidden>
+    <span data-i18n="empty.1"></span><br><span data-i18n="empty.2"></span>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="heat.title"></h2>
+  <div class="heat" id="heat"></div>
+</section>
+
+<script src="i18n.js"></script>
+<script src="schemes.js"></script>
+<script src="history.js"></script>
