@@ -1,7 +1,7 @@
 {
   "name": "sweep",
   "productName": "Sweep",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A floating study countdown for macOS, modelled on the physical dial timer",
   "main": "main.js",
   "author": "castalia",
