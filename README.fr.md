@@ -79,3 +79,7 @@ npm run dist        # produit un .dmg dans dist/
 Cela écrit `Sweep-<version>-arm64.dmg` et `Sweep-<version>-x64.dmg` dans `dist/`.
 Les deux ne sont pas signés — voir la note sur la quarantaine dans Installation.
 Signer et faire notariser correctement demande un Apple Developer ID payant.
+
+## Crédits
+
+Développé avec [Claude Code](https://claude.com/claude-code).

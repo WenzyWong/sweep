@@ -78,3 +78,7 @@ npm run dist        # 在 dist/ 产出 .dmg
 会在 `dist/` 生成 `Sweep-<版本>-arm64.dmg` 与 `Sweep-<版本>-x64.dmg`。
 两者均未签名——参见「安装」一节的隔离标记说明。
 要正式签名与公证需要付费的 Apple Developer ID。
+
+## 致谢
+
+本项目使用 [Claude Code](https://claude.com/claude-code) 协作开发。

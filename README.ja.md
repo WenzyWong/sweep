@@ -79,3 +79,7 @@ npm run dist        # dist/ に .dmg を出力
 `dist/` に `Sweep-<バージョン>-arm64.dmg` と `Sweep-<バージョン>-x64.dmg` が生成されます。
 どちらも未署名です——インストールの節にある検疫属性の説明を参照してください。
 正式に署名・公証するには有料の Apple Developer ID が必要です。
+
+## クレジット
+
+本プロジェクトは [Claude Code](https://claude.com/claude-code) と共同で開発されました。

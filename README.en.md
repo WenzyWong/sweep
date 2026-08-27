@@ -79,3 +79,7 @@ npm run dist        # builds a .dmg into dist/
 This writes `Sweep-<version>-arm64.dmg` and `Sweep-<version>-x64.dmg` into
 `dist/`. Both are unsigned — see the quarantine note under Installing.
 Signing and notarising properly needs a paid Apple Developer ID.
+
+## Credits
+
+Built with [Claude Code](https://claude.com/claude-code).
