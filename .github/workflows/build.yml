@@ -1,9 +1,12 @@
 name: build
 
-# Run it by hand from the Actions tab, or automatically when a version tag lands.
+# Builds on every push to main so a current installer is always downloadable
+# from the run's artifacts, and on a version tag so a release can be filled.
+# Can also be started by hand from the Actions tab.
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     tags: ['v*']
 
 permissions:

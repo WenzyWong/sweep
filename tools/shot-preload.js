@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 const settings = JSON.parse(process.argv.find(a => a.startsWith('--stub=')).slice(7))
 
 contextBridge.exposeInMainWorld('api', {
+  platform: process.platform,
   getSettings: async () => settings,
   setSettings: async () => settings,
   onSettingsChanged: () => {},
