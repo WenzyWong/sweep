@@ -65,7 +65,11 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Package
-        run: npx electron-builder ${{ matrix.flag }}
+        # --publish never matters: electron-builder sees CI and otherwise tries to
+        # publish to Releases on its own, which fails without a token even though
+        # the installers built fine. Publishing is the attach job's business, and
+        # only for tags.
+        run: npx electron-builder ${{ matrix.flag }} --publish never
         env:
           # unsigned builds: do not go looking for a signing identity
           CSC_IDENTITY_AUTO_DISCOVERY: false
