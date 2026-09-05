@@ -2,12 +2,12 @@
 
 [繁體中文](README.md) · [简体中文](README.zh-Hans.md) · [日本語](README.ja.md) · **English** · [Français](README.fr.md)
 
-A floating study countdown for macOS, modelled on the physical dial timer:
+A floating study countdown for macOS and Windows, modelled on the physical dial timer:
 a colour sector sweeps back to zero, and the face flashes when time is up.
 
 ![The six colourways](docs/colourways.png)
 
-- Floats above every window, on every Space, including other apps' fullscreen Spaces
+- Floats above every window. On macOS that extends to every Space, fullscreen ones included; Windows has no equivalent, so it stays on the desktop it was opened on
 - Two looks: full body with its top buttons, or a bare dial for minimum distraction
 - Six colourways from the reference timer, plus fully custom four-colour schemes
 - Set the time by dragging the dial or by typing minutes (1–60)
@@ -18,14 +18,24 @@ a colour sector sweeps back to zero, and the face flashes when time is up.
 
 ## Installing
 
-Grab the `.dmg` for your Mac from the [Releases](../../releases) page —
-`arm64` for Apple Silicon, `x64` for Intel — then drag Sweep into Applications.
+From the [Releases](../../releases) page:
 
-The build is unsigned, so the first launch needs the quarantine flag cleared:
+| File | For |
+|---|---|
+| `Sweep-<version>-arm64.dmg` | Mac, Apple Silicon |
+| `Sweep-<version>-x64.dmg` | Mac, Intel |
+| `Sweep-<version>-win-x64.exe` | Windows 10/11, 64-bit |
+
+Neither build is signed, so each system objects once.
+
+**macOS** — drag Sweep into Applications, then clear the quarantine flag:
 
 ```sh
 xattr -dr com.apple.quarantine "/Applications/Sweep.app"
 ```
+
+**Windows** — SmartScreen warns about an unrecognised publisher. Choose
+**More info**, then **Run anyway**.
 
 ## Running it from source
 
@@ -42,11 +52,11 @@ npm start
 | Type a time | Double-click the dial, enter 1–60, press Enter |
 | Start / pause | Click the centre knob, or the bar button on top |
 | Reset | Click the round button on top; in bare-dial mode, double-click the centre knob |
-| Move it | Drag the case or the dial's outer ring, or ⌘-drag anywhere |
+| Move it | Drag the case or the dial's outer ring, or ⌘/Ctrl-drag anywhere |
 | Everything else | Right-click: mode, size, colours, language, history, settings, quit |
 
-The app has no Dock icon, so quit from the right-click menu (or ⌘Q while a
-window is focused).
+The app stays out of the Dock and the taskbar, so quit from the right-click
+menu (or ⌘Q / Ctrl+Q while a window is focused).
 
 ## Where things live
 
@@ -68,17 +78,20 @@ renderer/
 tools/shot.js        dev-only: renders a page to a PNG for visual checks
 ```
 
-Settings and history are JSON files in `~/Library/Application Support/Sweep/`.
+Settings and history are JSON files, in `~/Library/Application Support/Sweep/` on macOS and `%APPDATA%\Sweep\` on Windows.
 
 ## Packaging
 
 ```sh
-npm run dist        # builds a .dmg into dist/
+npm run dist        # macOS: two .dmg
+npm run dist:win    # Windows: an NSIS installer
 ```
 
-This writes `Sweep-<version>-arm64.dmg` and `Sweep-<version>-x64.dmg` into
-`dist/`. Both are unsigned — see the quarantine note under Installing.
-Signing and notarising properly needs a paid Apple Developer ID.
+Each installer can only be built on its own platform. GitHub Actions runs both
+on every push to main and attaches them to the run's artifacts.
+
+Nothing is signed. Notarising on macOS needs a paid Apple Developer ID, and
+silencing SmartScreen on Windows needs a code-signing certificate.
 
 ## Credits
 

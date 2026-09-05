@@ -2,12 +2,12 @@
 
 [繁體中文](README.md) · [简体中文](README.zh-Hans.md) · [日本語](README.ja.md) · [English](README.en.md) · **Français**
 
-Un compte à rebours d'étude flottant pour macOS, inspiré du minuteur à cadran :
+Un compte à rebours d'étude flottant pour macOS et Windows, inspiré du minuteur à cadran :
 un secteur coloré revient vers zéro, et le cadran clignote quand le temps est écoulé.
 
 ![Les six palettes](docs/colourways.png)
 
-- Flotte au-dessus de toutes les fenêtres, sur tous les Spaces, y compris ceux en plein écran d'autres apps
+- Flotte au-dessus de toutes les fenêtres. Sur macOS cela couvre tous les Spaces, y compris ceux en plein écran d'autres apps ; Windows n'a pas d'équivalent, la fenêtre reste sur le bureau virtuel où elle a été ouverte
 - Deux apparences : le boîtier complet avec ses boutons, ou le cadran seul pour un minimum de distraction
 - Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs
 - Réglez la durée en faisant tourner le cadran ou en saisissant les minutes (1–60)
@@ -18,14 +18,24 @@ un secteur coloré revient vers zéro, et le cadran clignote quand le temps est 
 
 ## Installation
 
-Téléchargez le `.dmg` adapté à votre Mac depuis la page [Releases](../../releases) —
-`arm64` pour Apple Silicon, `x64` pour Intel — puis glissez Sweep dans Applications.
+Téléchargez depuis la page [Releases](../../releases) :
 
-La build n'est pas signée : il faut retirer l'attribut de quarantaine avant le premier lancement.
+| Fichier | Pour |
+|---|---|
+| `Sweep-<version>-arm64.dmg` | Mac, Apple Silicon |
+| `Sweep-<version>-x64.dmg` | Mac, Intel |
+| `Sweep-<version>-win-x64.exe` | Windows 10/11, 64 bits |
+
+Aucune des deux builds n'est signée : chaque système protestera une fois.
+
+**macOS** — glissez Sweep dans Applications, puis retirez l'attribut de quarantaine :
 
 ```sh
 xattr -dr com.apple.quarantine "/Applications/Sweep.app"
 ```
+
+**Windows** — SmartScreen signalera un éditeur inconnu. Choisissez
+**Informations complémentaires**, puis **Exécuter quand même**.
 
 ## Lancer depuis les sources
 
@@ -42,11 +52,11 @@ npm start
 | Saisir une durée | Double-cliquez sur le cadran, entrez 1–60, appuyez sur Entrée |
 | Démarrer / pause | Cliquez sur le bouton central, ou sur la barre en haut |
 | Remettre à zéro | Cliquez sur le bouton rond en haut ; en mode cadran seul, double-cliquez sur le bouton central |
-| Déplacer | Faites glisser le boîtier ou la couronne graduée, ou ⌘-glissez n'importe où |
+| Déplacer | Faites glisser le boîtier ou la couronne graduée, ou ⌘/Ctrl-glissez n'importe où |
 | Tout le reste | Clic droit : mode, taille, couleurs, langue, historique, réglages, quitter |
 
-L'app n'a pas d'icône dans le Dock : quittez-la depuis le menu contextuel
-(ou avec ⌘Q lorsqu'une fenêtre a le focus).
+L'app n'apparaît ni dans le Dock ni dans la barre des tâches : quittez-la depuis
+le menu contextuel (ou avec ⌘Q / Ctrl+Q lorsqu'une fenêtre a le focus).
 
 ## Organisation du code
 
@@ -68,17 +78,21 @@ renderer/
 tools/shot.js        outil de développement : rend une page en PNG pour vérifier l'apparence
 ```
 
-Les réglages et l'historique sont des fichiers JSON dans `~/Library/Application Support/Sweep/`.
+Les réglages et l'historique sont des fichiers JSON, dans `~/Library/Application Support/Sweep/` sur macOS et `%APPDATA%\Sweep\` sur Windows.
 
 ## Empaquetage
 
 ```sh
-npm run dist        # produit un .dmg dans dist/
+npm run dist        # macOS : deux .dmg
+npm run dist:win    # Windows : un installeur NSIS
 ```
 
-Cela écrit `Sweep-<version>-arm64.dmg` et `Sweep-<version>-x64.dmg` dans `dist/`.
-Les deux ne sont pas signés — voir la note sur la quarantaine dans Installation.
-Signer et faire notariser correctement demande un Apple Developer ID payant.
+Chaque installeur ne peut être construit que sur sa propre plateforme. GitHub
+Actions fait les deux à chaque push sur main ; les fichiers sont joints aux
+artifacts de l'exécution.
+
+Rien n'est signé. La notarisation macOS demande un Apple Developer ID payant, et
+faire taire SmartScreen sous Windows demande un certificat de signature de code.
 
 ## Crédits
 

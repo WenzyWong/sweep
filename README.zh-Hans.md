@@ -2,12 +2,12 @@
 
 [繁體中文](README.md) · **简体中文** · [日本語](README.ja.md) · [English](README.en.md) · [Français](README.fr.md)
 
-一款悬浮在 macOS 桌面上的学习倒计时器，以实体转盘计时器为原型：
+一款悬浮在 macOS 与 Windows 桌面上的学习倒计时器，以实体转盘计时器为原型：
 彩色扇形一路扫回零点，时间到时盘面闪烁提醒。
 
 ![六种配色方案](docs/colourways.png)
 
-- 置顶悬浮于所有窗口之上，跨越所有桌面（Space），包含其他 App 的全屏空间
+- 置顶悬浮于所有窗口之上。macOS 上跨越所有桌面（Space），含全屏空间；Windows 没有对应能力，会留在打开时的那个虚拟桌面
 - 两种外观：带顶部按钮的完整机身，或干扰最小的极简圆盘
 - 六组取自实体计时器的预设配色，另可完全自定义四色方案
 - 拨动盘面或直接输入分钟数（1–60）来设定时间
@@ -18,14 +18,23 @@
 
 ## 安装
 
-到 [Releases](../../releases) 页面下载对应机型的 `.dmg`——Apple Silicon 选 `arm64`，
-Intel 选 `x64`——然后把 Sweep 拖进「应用程序」。
+到 [Releases](../../releases) 页面下载：
 
-安装包未经 Apple 签名，首次打开前需要清除隔离标记：
+| 文件 | 适用 |
+|---|---|
+| `Sweep-<版本>-arm64.dmg` | Mac，Apple Silicon |
+| `Sweep-<版本>-x64.dmg` | Mac，Intel |
+| `Sweep-<版本>-win-x64.exe` | Windows 10/11，64 位 |
+
+两个平台的安装包都未经签名，所以各自会拦一次。
+
+**macOS**——把 Sweep 拖进「应用程序」，然后清除隔离标记：
 
 ```sh
 xattr -dr com.apple.quarantine "/Applications/Sweep.app"
 ```
+
+**Windows**——SmartScreen 会提示发行者无法识别。点「**更多信息**」→「**仍要运行**」。
 
 ## 从源码运行
 
@@ -42,10 +51,10 @@ npm start
 | 输入时间 | 双击盘面，输入 1–60，按 Enter |
 | 开始 / 暂停 | 点击中央旋钮，或顶部的长条按钮 |
 | 重置 | 点击顶部的圆形按钮；极简圆盘模式下双击中央旋钮 |
-| 移动窗口 | 拖拽机身或盘面外圈刻度区，或按住 ⌘ 在任意处拖拽 |
+| 移动窗口 | 拖拽机身或盘面外圈刻度区，或按住 ⌘／Ctrl 在任意处拖拽 |
 | 其余功能 | 右键菜单：模式、尺寸、配色、语言、记录、设置、退出 |
 
-本 App 不占用 Dock 图标，因此请从右键菜单退出（或在窗口获得焦点时按 ⌘Q）。
+本 App 不占用 Dock 也不进任务栏，因此请从右键菜单退出（或在窗口获得焦点时按 ⌘Q／Ctrl+Q）。
 
 ## 项目结构
 
@@ -67,17 +76,20 @@ renderer/
 tools/shot.js        开发用：把页面渲染成 PNG 以便视觉检查
 ```
 
-设置与记录是存放在 `~/Library/Application Support/Sweep/` 的 JSON 文件。
+设置与记录是 JSON 文件：macOS 在 `~/Library/Application Support/Sweep/`，Windows 在 `%APPDATA%\Sweep\`。
 
 ## 打包
 
 ```sh
-npm run dist        # 在 dist/ 产出 .dmg
+npm run dist        # macOS：两个 .dmg
+npm run dist:win    # Windows：NSIS 安装程序
 ```
 
-会在 `dist/` 生成 `Sweep-<版本>-arm64.dmg` 与 `Sweep-<版本>-x64.dmg`。
-两者均未签名——参见「安装」一节的隔离标记说明。
-要正式签名与公证需要付费的 Apple Developer ID。
+各平台的安装包只能在该平台上构建。GitHub Actions 会在每次推送 main 时两边都跑一次，
+产物附在该次运行的 Artifacts 里。
+
+所有安装包均未签名。macOS 要正式签名与公证需要付费的 Apple Developer ID，
+Windows 要去除 SmartScreen 警告则需要代码签名证书。
 
 ## 致谢
 
