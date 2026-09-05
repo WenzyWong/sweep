@@ -1,4 +1,6 @@
 const $ = id => document.getElementById(id)
+document.body.classList.add(api.platform === 'darwin' ? 'mac' : 'win')
+
 const L = (key, vars) => window.t(settings ? settings.lang : 'en', key, vars)
 
 let history = {}

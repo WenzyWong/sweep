@@ -1,6 +1,8 @@
-const { app, BrowserWindow, ipcMain, Menu, Notification, screen } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, Notification, screen, nativeTheme } = require('electron')
 const path = require('path')
 const fs = require('fs')
+
+const IS_MAC = process.platform === 'darwin'
 const { LANGS, t, detectLang } = require('./renderer/i18n.js')
 
 // ---------------------------------------------------------------- constants
@@ -121,9 +123,11 @@ function createTimerWindow () {
 
   timerWin.loadFile(path.join(__dirname, 'renderer', 'index.html'))
 
-  // float above everything, on every Space, including other apps' fullscreen Spaces
+  // Float above everything. On macOS that extends to every Space, including
+  // other apps' fullscreen Spaces; Windows has no equivalent for pinning a
+  // window across virtual desktops, so there it stays on the desktop it opened.
   timerWin.setAlwaysOnTop(true, 'screen-saver')
-  timerWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  if (IS_MAC) timerWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
   timerWin.once('ready-to-show', () => timerWin.showInactive())
 
@@ -149,10 +153,10 @@ function createAuxWindow (ref, file, opts) {
     minWidth: opts.minWidth || opts.width,
     minHeight: 360,
     title: opts.title,
-    titleBarStyle: 'hiddenInset',
-    backgroundColor: '#00000000',
-    transparent: true,
-    vibrancy: 'sidebar',
+    autoHideMenuBar: true,
+    ...(IS_MAC
+      ? { titleBarStyle: 'hiddenInset', transparent: true, vibrancy: 'sidebar', backgroundColor: '#00000000' }
+      : { backgroundColor: nativeTheme.shouldUseDarkColors ? '#1f1f22' : '#f4f4f6' }),
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -162,7 +166,7 @@ function createAuxWindow (ref, file, opts) {
   })
   win.loadFile(path.join(__dirname, 'renderer', file))
   win.once('ready-to-show', () => {
-    app.focus({ steal: true })   // the app is an accessory (no Dock icon), so ask for focus
+    if (IS_MAC) app.focus({ steal: true })   // an accessory app has to ask for focus
     win.show()
   })
   return win
@@ -329,9 +333,9 @@ ipcMain.on('menu:show', () => {
     { label: L('menu.language'), submenu: languageMenu() },
     { type: 'separator' },
     { label: L('menu.history'), click: openHistory },
-    { label: L('menu.settings'), accelerator: 'Command+,', click: openSettings },
+    { label: L('menu.settings'), accelerator: 'CommandOrControl+,', click: openSettings },
     { type: 'separator' },
-    { label: L('menu.quit'), accelerator: 'Command+Q', click: () => app.quit() }
+    { label: L('menu.quit'), accelerator: 'CommandOrControl+Q', click: () => app.quit() }
   ]
   Menu.buildFromTemplate(template).popup({ window: timerWin })
 })
@@ -344,7 +348,7 @@ function applyLanguage () {
     {
       label: 'Sweep',
       submenu: [
-        { label: L('menu.settings'), accelerator: 'Command+,', click: openSettings },
+        { label: L('menu.settings'), accelerator: 'CommandOrControl+,', click: openSettings },
         { label: L('menu.history'), click: openHistory },
         { type: 'separator' },
         { role: 'quit', label: L('menu.quit') }
@@ -364,7 +368,9 @@ function applyLanguage () {
 
 // ---------------------------------------------------------------- lifecycle
 app.whenReady().then(() => {
-  if (process.platform === 'darwin') app.dock.hide()
+  if (IS_MAC) app.dock.hide()
+  // without this, Windows labels notifications with the executable's id
+  app.setAppUserModelId('com.castalia.sweep')
   if (!settings.lang) {
     settings.lang = detectLang(app.getLocale())
     persistSettings()

@@ -26,7 +26,9 @@ html, body {
   cursor: default;
   -webkit-user-select: none;
   user-select: none;
-  font-family: ui-rounded, -apple-system, "SF Pro Rounded", system-ui, sans-serif;
+  font-family: ui-rounded, -apple-system, "SF Pro Rounded", "Segoe UI Variable Display",
+               "Segoe UI", "Microsoft JhengHei", "Microsoft YaHei", "Yu Gothic UI",
+               system-ui, sans-serif;
 }
 
 #stage {

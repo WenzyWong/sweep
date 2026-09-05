@@ -19,16 +19,25 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: -apple-system, system-ui, "PingFang TC", sans-serif;
+  font-family: -apple-system, "PingFang TC", "Segoe UI Variable Text", "Segoe UI",
+               "Microsoft JhengHei", "Microsoft YaHei", "Yu Gothic UI",
+               system-ui, sans-serif;
   font-size: 13px;
   color: var(--fg);
   background: var(--bg);
-  padding: 44px 22px 26px;
+  padding: 22px 22px 26px;
   -webkit-user-select: none;
   user-select: none;
 }
 
-.titlebar-drag {
+/* Only macOS gets an inset title bar, so only macOS needs room for the traffic
+   lights and a strip to drag the window by. Elsewhere the window has a real
+   title bar of its own. */
+.titlebar-drag { display: none; }
+
+body.mac { padding-top: 44px; }
+body.mac .titlebar-drag {
+  display: block;
   position: fixed; top: 0; left: 0; right: 0; height: 38px;
   -webkit-app-region: drag;
 }

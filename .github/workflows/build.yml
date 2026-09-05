@@ -1,0 +1,93 @@
+name: build
+
+# Run it by hand from the Actions tab, or automatically when a version tag lands.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    name: syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # A typo should fail in seconds rather than after a ten-minute package step.
+      - name: Parse every script
+        run: |
+          for f in main.js preload.js renderer/*.js tools/*.js; do
+            node --check "$f" || exit 1
+          done
+      - name: Every language covers every key
+        run: |
+          node -e '
+            const { LANGS, STRINGS } = require("./renderer/i18n.js")
+            const base = Object.keys(STRINGS["zh-Hant"])
+            let bad = false
+            for (const l of LANGS) {
+              const missing = base.filter(k => !(k in STRINGS[l.id]))
+              if (missing.length) { console.error(l.id, "missing:", missing.join(", ")); bad = true }
+            }
+            if (bad) process.exit(1)
+            console.log(LANGS.length + " languages, " + base.length + " keys, complete")
+          '
+
+  build:
+    name: ${{ matrix.label }}
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            label: macOS
+            flag: --mac
+            glob: dist/*.dmg
+          - os: windows-latest
+            label: Windows
+            flag: --win
+            glob: dist/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Package
+        run: npx electron-builder ${{ matrix.flag }}
+        env:
+          # unsigned builds: do not go looking for a signing identity
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sweep-${{ matrix.label }}
+          path: ${{ matrix.glob }}
+          if-no-files-found: error
+
+  attach:
+    name: attach to release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Upload to the release for this tag, if one exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" artifacts/*/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            echo "No release exists for $GITHUB_REF_NAME."
+            echo "The installers are attached to this workflow run; publish the release and re-run this job to move them across."
+          fi

@@ -2,6 +2,8 @@ let settings = null
 let draft = null   // the four colours currently in the pickers
 
 const $ = id => document.getElementById(id)
+document.body.classList.add(api.platform === 'darwin' ? 'mac' : 'win')
+
 const L = (key, vars) => window.t(settings ? settings.lang : 'en', key, vars)
 const pickers = { body: $('c-body'), sector: $('c-sector'), knob: $('c-knob'), btn: $('c-btn') }
 
