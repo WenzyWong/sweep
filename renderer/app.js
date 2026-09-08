@@ -4,6 +4,9 @@
 const PAD = 18
 const NUB_RATIO = 0.10
 const TIP_RATIO = 0.26
+// A click, or a hand that shifts a pixel or two, must not re-time a running
+// countdown. Only movement past this many pixels counts as turning the dial.
+const DRAG_SLOP = 5
 
 const stage = document.getElementById('stage')
 const faceWrap = document.querySelector('.face-wrap')
@@ -18,6 +21,8 @@ const againBtn = document.querySelector('.again')
 const btnBar = document.querySelector('.btn-bar')
 const btnRound = document.querySelector('.btn-round')
 const tip = document.getElementById('tip')
+const notice = document.getElementById('notice')
+const noticeText = notice.querySelector('.tip-main')
 const tipMain = tip.querySelector('.tip-main')
 const tipHint = tip.querySelector('.tip-hint')
 
@@ -83,6 +88,20 @@ function applySettings (s) {
 function applyI18n () {
   if (!againBtn.hidden) againBtn.textContent = L('again', { m: timer.minutes })
   if (tipFor) renderTip()
+}
+
+// ---------------------------------------------------------------- notice
+let noticeTimer = null
+
+function showNotice (text) {
+  noticeText.textContent = text
+  notice.hidden = false
+  requestAnimationFrame(() => notice.classList.add('show'))
+  clearTimeout(noticeTimer)
+  noticeTimer = setTimeout(() => {
+    notice.classList.remove('show')
+    setTimeout(() => { notice.hidden = true }, 200)
+  }, 1800)
 }
 
 // ---------------------------------------------------------------- tooltip
@@ -157,6 +176,18 @@ function render () {
 
 timer.addEventListener('change', render)
 
+// Record the run in flight whenever its deadline changes, and clear it the
+// moment nothing is counting down. Cheap: the key only moves when endAt does.
+let reportedRun = ''
+function reportRun () {
+  const key = timer.state === 'running' ? String(timer.endAt) : ''
+  if (key === reportedRun) return
+  reportedRun = key
+  if (key) api.runStarted(timer.endAt, timer.minutes)
+  else api.runCleared()
+}
+timer.addEventListener('change', reportRun)
+
 // ---------------------------------------------------------------- finishing
 function stopFlash () {
   clearTimeout(flashTimer)
@@ -182,6 +213,16 @@ againBtn.addEventListener('click', e => {
   e.stopPropagation()
   press('click')
   stopFlash()
+
+  // The same button carries two offers: replay the run that just ended, or log
+  // the one that was cut short by a crash. Only one is ever on screen.
+  if (recoverPending) {
+    recoverPending = false
+    againBtn.hidden = true
+    api.recover(true)
+    return
+  }
+
   dismissAgain()
   timer.setMinutes(timer.minutes)
   timer.reset()
@@ -191,8 +232,14 @@ againBtn.addEventListener('click', e => {
 // ---------------------------------------------------------------- controls
 // The replay button offers "another N minutes" for the run that just ended.
 // Touching the dial makes that offer stale, so it goes away.
+let recoverPending = false
+
 function dismissAgain () {
   againBtn.hidden = true
+  if (recoverPending) {
+    recoverPending = false
+    api.recover(false)          // asked and declined; do not ask again
+  }
 }
 
 function press (kind) {
@@ -271,7 +318,15 @@ stage.addEventListener('mousedown', e => {
 
   if (!e.metaKey && onFace) {
     dismissAgain()
-    drag = { type: 'dial', rect, lastAngle: Dial.pointerAngle(e, rect), acc: timer.displayMinutes }
+    drag = {
+      type: 'dial',
+      rect,
+      lastAngle: Dial.pointerAngle(e, rect),
+      acc: timer.displayMinutes,
+      ox: e.clientX,
+      oy: e.clientY,
+      armed: false          // nothing changes until the pointer clears DRAG_SLOP
+    }
   } else {
     drag = { type: 'window', sx: e.screenX, sy: e.screenY }
   }
@@ -292,16 +347,35 @@ window.addEventListener('mousemove', e => {
     return
   }
 
+  if (!drag.armed) {
+    if (Math.hypot(e.clientX - drag.ox, e.clientY - drag.oy) < DRAG_SLOP) return
+    // Start measuring from here, so the slop itself is not applied as a turn.
+    drag.armed = true
+    drag.lastAngle = Dial.pointerAngle(e, drag.rect)
+    return
+  }
+
   const angle = Dial.pointerAngle(e, drag.rect)
   drag.acc = Math.max(1, Math.min(60, drag.acc + Dial.angleDelta(drag.lastAngle, angle) / 6))
   drag.lastAngle = angle
-  timer.setMinutes(Math.round(drag.acc))
+  setMinutesAnnounced(Math.round(drag.acc))
 })
 
 window.addEventListener('mouseup', () => {
-  if (drag && drag.type === 'dial') rememberMinutes()
+  if (drag && drag.type === 'dial' && drag.armed) rememberMinutes()
   drag = null
 })
+
+// Turning the dial mid-run restarts the countdown, the way the physical timer
+// does. That used to happen in silence, which is how a session goes missing.
+function setMinutesAnnounced (m) {
+  const wasRunning = timer.state === 'running'
+  const before = timer.minutes
+  timer.setMinutes(m)
+  if (wasRunning && timer.minutes !== before) {
+    showNotice(L('retimed', { m: timer.minutes }))
+  }
+}
 
 // ---------------------------------------------------------------- typing a duration
 faceWrap.addEventListener('dblclick', e => {
@@ -316,7 +390,7 @@ function commitInput () {
   const v = parseInt(minuteInput.value, 10)
   if (Number.isFinite(v)) {
     dismissAgain()
-    timer.setMinutes(v)
+    setMinutesAnnounced(v)
     if (timer.state !== 'running') timer.reset()
     rememberMinutes()
   }
@@ -371,3 +445,11 @@ window.addEventListener('contextmenu', e => {
 // ---------------------------------------------------------------- boot
 api.onSettingsChanged(applySettings)
 api.getSettings().then(applySettings)
+
+// A run whose clock ran out while the app was not there to notice it
+api.getRecoverable().then(pending => {
+  if (!pending) return
+  recoverPending = true
+  againBtn.textContent = L('recover', { m: pending.minutes })
+  againBtn.hidden = false
+})

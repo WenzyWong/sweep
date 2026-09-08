@@ -11,7 +11,7 @@ a colour sector sweeps back to zero, and the face flashes when time is up.
 - Two looks: full body with its top buttons, or a bare dial for minimum distraction
 - Six colourways from the reference timer, plus fully custom four-colour schemes
 - Set the time by dragging the dial or by typing minutes (1–60)
-- Every completed run is logged; the history window shows the day's rings and the last 30 days
+- Every completed run is logged; the history window shows the day's rings and the last 30 days. A run cut short by a quit or a crash is offered for logging on the next launch
 - Adjustable opacity, set separately for running and idle; hovering always brings it back to solid
 - Buttons click, reset sweeps, and a soft note marks the end
 - Traditional Chinese, Simplified Chinese, Japanese, English and French, picked up from the system locale on first launch

@@ -11,7 +11,7 @@ un secteur coloré revient vers zéro, et le cadran clignote quand le temps est 
 - Deux apparences : le boîtier complet avec ses boutons, ou le cadran seul pour un minimum de distraction
 - Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs
 - Réglez la durée en faisant tourner le cadran ou en saisissant les minutes (1–60)
-- Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours
+- Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours. Une séance interrompue par une fermeture ou un plantage est proposée à l'enregistrement au lancement suivant
 - Opacité réglable séparément pendant une séance et au repos ; le survol la ramène toujours à l'opacité pleine
 - Les boutons cliquent, la remise à zéro balaie, et une note douce marque la fin
 - Chinois traditionnel, chinois simplifié, japonais, anglais et français, choisis d'après la langue du système au premier lancement

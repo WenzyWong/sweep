@@ -21,7 +21,8 @@ app.whenReady().then(async () => {
     webPreferences: {
       preload: path.join(__dirname, 'shot-preload.js'),
       contextIsolation: true,
-      additionalArguments: [`--stub=${settings}`, `--hist=${args.hist || '{}'}`]
+      additionalArguments: [`--stub=${settings}`, `--hist=${args.hist || '{}'}`,
+        ...(args.recover ? [`--recover=${args.recover}`] : [])]
     }
   })
   const pagePath = page.startsWith('tools/')

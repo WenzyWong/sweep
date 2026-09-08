@@ -11,6 +11,12 @@ contextBridge.exposeInMainWorld('api', {
   getHistory: async () => JSON.parse(process.argv.find(a => a.startsWith('--hist=')).slice(7)),
   addSession: async () => {},
   onHistoryChanged: () => {},
+  runStarted: () => {}, runCleared: () => {},
+  getRecoverable: async () => {
+    const a = process.argv.find(x => x.startsWith('--recover='))
+    return a ? JSON.parse(a.slice(10)) : null
+  },
+  recover: async () => {},
   moveBy: () => {}, setIgnoreMouse: () => {}, raise: () => {},
   showMenu: () => {}, openSettings: () => {}, openHistory: () => {},
   notify: () => {}, quit: () => {}

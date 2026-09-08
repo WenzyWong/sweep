@@ -16,6 +16,7 @@ const STRINGS = {
     'btn.start': '開始', 'btn.pause': '暫停', 'btn.reset': '重置',
     'tip.knobHint': '雙擊重置',
     'again': '↻ 再 {m} 分鐘',
+    'recover': '補記 {m} 分鐘？', 'retimed': '已重設為 {m} 分鐘',
 
     'notify.title': '倒數結束',
     'notify.body': '{m} 分鐘的專注完成了',
@@ -60,6 +61,7 @@ const STRINGS = {
     'btn.start': '开始', 'btn.pause': '暂停', 'btn.reset': '重置',
     'tip.knobHint': '双击重置',
     'again': '↻ 再 {m} 分钟',
+    'recover': '补记 {m} 分钟？', 'retimed': '已重设为 {m} 分钟',
 
     'notify.title': '倒计时结束',
     'notify.body': '{m} 分钟的专注完成了',
@@ -104,6 +106,7 @@ const STRINGS = {
     'btn.start': '開始', 'btn.pause': '一時停止', 'btn.reset': 'リセット',
     'tip.knobHint': 'ダブルクリックでリセット',
     'again': '↻ もう {m} 分',
+    'recover': '{m} 分を記録しますか？', 'retimed': '{m} 分に設定し直しました',
 
     'notify.title': '時間になりました',
     'notify.body': '{m} 分の集中が完了しました',
@@ -148,6 +151,7 @@ const STRINGS = {
     'btn.start': 'Start', 'btn.pause': 'Pause', 'btn.reset': 'Reset',
     'tip.knobHint': 'Double-click to reset',
     'again': '↻ Another {m} min',
+    'recover': 'Log the missed {m} min?', 'retimed': 'Restarted at {m} min',
 
     'notify.title': "Time's up",
     'notify.body': '{m} minutes of focus, done.',
@@ -193,6 +197,7 @@ const STRINGS = {
     'btn.start': 'Démarrer', 'btn.pause': 'Pause', 'btn.reset': 'Remettre à zéro',
     'tip.knobHint': 'Double-clic : remise à zéro',
     'again': '↻ Encore {m} min',
+    'recover': 'Enregistrer les {m} min manquantes ?', 'retimed': 'Redémarré à {m} min',
 
     'notify.title': 'Temps écoulé',
     'notify.body': '{m} minutes de concentration, terminé.',

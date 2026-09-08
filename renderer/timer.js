@@ -27,6 +27,11 @@ class Timer extends EventTarget {
     this.emit('change')
   }
 
+  // when the current run is due to finish, for the crash-recovery record
+  get endAt () {
+    return this.state === 'running' ? this._endAt : 0
+  }
+
   // minutes still on the clock, as a float, for drawing the sector
   get displayMinutes () {
     return this.state === 'idle' ? this.minutes : this.remainingMs / 60000

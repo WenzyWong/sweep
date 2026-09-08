@@ -33,6 +33,8 @@ const DEFAULTS = {
 const userDir = app.getPath('userData')
 const settingsFile = path.join(userDir, 'settings.json')
 const historyFile = path.join(userDir, 'history.json')
+// A run in progress, so that a crash or a quit does not erase it silently.
+const pendingFile = path.join(userDir, 'pending.json')
 
 function readJSON (file, fallback) {
   try {
@@ -73,6 +75,15 @@ migrateFromOldName()
 
 let settings = readJSON(settingsFile, DEFAULTS)
 let history = readJSON(historyFile, {})
+
+// If a run was in flight when the app last stopped and its clock has since run
+// out, it is worth offering to log. One that had time left is simply gone.
+let recoverable = null
+try {
+  const pending = JSON.parse(fs.readFileSync(pendingFile, 'utf8'))
+  if (pending && pending.endAt <= Date.now()) recoverable = pending
+} catch { /* no run was in flight */ }
+try { fs.unlinkSync(pendingFile) } catch { /* nothing to clear */ }
 
 let saveTimer = null
 function persistSettings () {
@@ -271,6 +282,30 @@ ipcMain.handle('history:add', (_e, { minutes }) => {
 })
 
 ipcMain.handle('history:get', () => history)
+
+// ---------------------------------------------------------------- crash recovery
+ipcMain.on('run:started', (_e, { endAt, minutes }) => {
+  writeJSON(pendingFile, { endAt, minutes })
+})
+
+ipcMain.on('run:cleared', () => {
+  try { fs.unlinkSync(pendingFile) } catch { /* already gone */ }
+})
+
+ipcMain.handle('run:recoverable', () => recoverable)
+
+ipcMain.handle('run:recover', (_e, accept) => {
+  const pending = recoverable
+  recoverable = null
+  if (!accept || !pending) return history
+  const key = dateKey(pending.endAt)
+  if (!history[key]) history[key] = []
+  history[key].push({ t: pending.endAt, m: pending.minutes })
+  history[key].sort((a, b) => a.t - b.t)
+  writeJSON(historyFile, history)
+  broadcast('history:changed', history)
+  return history
+})
 
 // ---------------------------------------------------------------- context menu
 function schemeMenu () {

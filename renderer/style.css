@@ -131,6 +131,13 @@ body.hot #stage { opacity: 1; }
   transform: translateY(0);
 }
 
+/* A notice is about the dial as a whole rather than one control, so it stays
+   centred, caret included. These rules follow .tip.show deliberately — the two
+   selectors have the same specificity and would otherwise cancel the centring. */
+.notice { left: 50%; transform: translate(-50%, -4px); }
+.notice.show { transform: translate(-50%, 0); }
+.notice::after { left: 50%; }
+
 body.tiny .tip { display: none; }
 
 /* ------------------------------------------------------------ case */
