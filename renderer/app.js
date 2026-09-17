@@ -54,14 +54,30 @@ function splitQuote (text) {
   return [words.slice(0, best).join(' '), words.slice(best).join(' ')]
 }
 
-function applySettings (s) {
-  settings = s
-  const sc = window.findScheme(s.schemeId, s.customSchemes)
+// A colourway being edited in the settings window. While one is set it wins
+// over the saved scheme, so the dial shows each change as it is made.
+let previewScheme = null
+
+function paintScheme () {
+  const sc = previewScheme || window.findScheme(settings.schemeId, settings.customSchemes)
   const root = document.documentElement.style
   root.setProperty('--body', sc.body)
   root.setProperty('--sector', sc.sector)
   root.setProperty('--knob', sc.knob)
   root.setProperty('--btn', sc.btn)
+  // a faded dial is no use for judging colour, so hold it solid while editing
+  document.body.classList.toggle('previewing', !!previewScheme)
+}
+
+api.onPreviewScheme(sc => {
+  previewScheme = sc
+  if (settings) paintScheme()
+})
+
+function applySettings (s) {
+  settings = s
+  paintScheme()
+  const root = document.documentElement.style
   root.setProperty('--unit', s.sizeUnit + 'px')
   root.setProperty('--op-active', String(s.opacity))
   root.setProperty('--op-idle', String(s.idleFade ? s.idleOpacity : s.opacity))

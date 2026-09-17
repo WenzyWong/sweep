@@ -9,7 +9,7 @@ a colour sector sweeps back to zero, and the face flashes when time is up.
 
 - Floats above every window. On macOS that extends to every Space, fullscreen ones included; Windows has no equivalent, so it stays on the desktop it was opened on
 - Two looks: full body with its top buttons, or a bare dial for minimum distraction
-- Six colourways from the reference timer, plus fully custom four-colour schemes
+- Six colourways from the reference timer, plus fully custom four-colour schemes; the dial takes each colour as you pick it, so you can judge it before saving
 - Set the time by dragging the dial or by typing minutes (1–60)
 - Every completed run is logged; the history window shows the day's rings and the last 30 days. A run cut short by a quit or a crash is offered for logging on the next launch
 - Adjustable opacity, set separately for running and idle; hovering always brings it back to solid

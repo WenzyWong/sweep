@@ -9,7 +9,7 @@ un secteur coloré revient vers zéro, et le cadran clignote quand le temps est 
 
 - Flotte au-dessus de toutes les fenêtres. Sur macOS cela couvre tous les Spaces, y compris ceux en plein écran d'autres apps ; Windows n'a pas d'équivalent, la fenêtre reste sur le bureau virtuel où elle a été ouverte
 - Deux apparences : le boîtier complet avec ses boutons, ou le cadran seul pour un minimum de distraction
-- Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs
+- Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs ; le cadran prend chaque couleur au moment où vous la choisissez, avant même d'enregistrer
 - Réglez la durée en faisant tourner le cadran ou en saisissant les minutes (1–60)
 - Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours. Une séance interrompue par une fermeture ou un plantage est proposée à l'enregistrement au lancement suivant
 - Opacité réglable séparément pendant une séance et au repos ; le survol la ramène toujours à l'opacité pleine

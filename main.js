@@ -187,7 +187,10 @@ function openSettings () {
   settingsWin = createAuxWindow(settingsWin, 'settings.html', {
     width: 420, height: 640, title: t(settings.lang, 'win.settings')
   })
-  settingsWin.on('closed', () => { settingsWin = null })
+  settingsWin.on('closed', () => {
+    settingsWin = null
+    broadcastPreview(null)
+  })
 }
 
 function openHistory () {
@@ -336,6 +339,14 @@ function languageMenu () {
     }
   }))
 }
+
+// A colourway being edited in the settings window, shown on the dial without
+// being saved. Null puts the real scheme back.
+function broadcastPreview (scheme) {
+  if (timerWin && !timerWin.isDestroyed()) timerWin.webContents.send('preview:scheme', scheme)
+}
+
+ipcMain.on('preview:scheme', (_e, scheme) => broadcastPreview(scheme))
 
 ipcMain.on('menu:show', () => {
   const L = key => t(settings.lang, key)

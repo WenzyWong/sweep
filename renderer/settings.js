@@ -76,6 +76,7 @@ $('schemes').addEventListener('click', async e => {
   const del = e.target.closest('[data-del]')
   if (del) {
     const id = del.dataset.del
+    clearPreview()
     const custom = settings.customSchemes.filter(s => s.id !== id)
     const patch = { customSchemes: custom }
     if (settings.schemeId === id) patch.schemeId = 'blush'
@@ -83,7 +84,10 @@ $('schemes').addEventListener('click', async e => {
     return
   }
   const card = e.target.closest('.scheme')
-  if (card) await api.setSettings({ schemeId: card.dataset.id })
+  if (card) {
+    clearPreview()                 // a chosen scheme replaces whatever was being tried
+    await api.setSettings({ schemeId: card.dataset.id })
+  }
 })
 
 $('save-scheme').addEventListener('click', async () => {
@@ -94,11 +98,35 @@ $('save-scheme').addEventListener('click', async () => {
     schemeId: scheme.id
   })
   $('scheme-name').value = ''
+  clearPreview()                   // saved, so the real scheme now matches
 })
 
-for (const [key, el] of Object.entries(pickers)) {
-  el.addEventListener('input', () => { draft[key] = el.value; checkContrast() })
+// The colour pickers fire continuously while a swatch is dragged, so the
+// preview is coalesced to one send per frame.
+let previewQueued = false
+function sendPreview () {
+  if (previewQueued) return
+  previewQueued = true
+  requestAnimationFrame(() => {
+    previewQueued = false
+    api.previewScheme({ ...draft })
+  })
 }
+
+function clearPreview () {
+  api.previewScheme(null)
+}
+
+for (const [key, el] of Object.entries(pickers)) {
+  el.addEventListener('input', () => {
+    draft[key] = el.value
+    checkContrast()
+    sendPreview()          // show it on the dial straight away, unsaved
+  })
+}
+
+// The dial goes back to the saved scheme when this window is done with.
+window.addEventListener('beforeunload', clearPreview)
 
 // ---------------------------------------------------------------- other controls
 $('mode-toggle').addEventListener('click', () =>
@@ -137,14 +165,22 @@ function buildLangOptions () {
 buildLangOptions()
 
 // ---------------------------------------------------------------- sync
+let lastSchemeId = null
+
 function apply (s) {
   settings = s
   window.applyDom(document, s.lang)
   document.title = L('win.settings')
   $('lang').value = s.lang
   const active = window.findScheme(s.schemeId, s.customSchemes)
-  draft = { body: active.body, sector: active.sector, knob: active.knob, btn: active.btn }
-  for (const [key, el] of Object.entries(pickers)) el.value = draft[key]
+  // Only reload the pickers when the selected scheme actually changed. Doing it
+  // on every settings change would wipe an in-progress edit the moment the size
+  // slider or any other control moved.
+  if (s.schemeId !== lastSchemeId) {
+    lastSchemeId = s.schemeId
+    draft = { body: active.body, sector: active.sector, knob: active.knob, btn: active.btn }
+    for (const [key, el] of Object.entries(pickers)) el.value = draft[key]
+  }
   document.documentElement.style.setProperty('--accent', active.sector)
 
   renderSchemes()

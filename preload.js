@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('api', {
   addSession: minutes => ipcRenderer.invoke('history:add', { minutes }),
   onHistoryChanged: cb => ipcRenderer.on('history:changed', (_e, h) => cb(h)),
 
+  previewScheme: scheme => ipcRenderer.send('preview:scheme', scheme),
+  onPreviewScheme: cb => ipcRenderer.on('preview:scheme', (_e, s) => cb(s)),
+
   runStarted: (endAt, minutes) => ipcRenderer.send('run:started', { endAt, minutes }),
   runCleared: () => ipcRenderer.send('run:cleared'),
   getRecoverable: () => ipcRenderer.invoke('run:recoverable'),

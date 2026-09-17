@@ -48,7 +48,8 @@ body.fade #stage { opacity: var(--op-idle); }
 
 /* Pointer over it: always fully solid, whatever the two settings say. This
    rule comes last so it wins over both of the above. */
-body.hot #stage { opacity: 1; }
+body.hot #stage,
+body.previewing #stage { opacity: 1; }
 
 /* ------------------------------------------------------------ top buttons */
 .nub { position: relative; height: var(--nub); }
