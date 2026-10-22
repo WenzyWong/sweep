@@ -16,6 +16,10 @@ contextBridge.exposeInMainWorld('api', {
 
   runStarted: (endAt, minutes) => ipcRenderer.send('run:started', { endAt, minutes }),
   runCleared: () => ipcRenderer.send('run:cleared'),
+  reportTimer: state => ipcRenderer.send('timer:state', state),
+  getTimerState: () => ipcRenderer.invoke('timer:get'),
+  onTimerCommand: cb => ipcRenderer.on('timer:command', (_e, cmd) => cb(cmd)),
+
   getRecoverable: () => ipcRenderer.invoke('run:recoverable'),
   recover: accept => ipcRenderer.invoke('run:recover', accept),
 

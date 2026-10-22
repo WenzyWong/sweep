@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, Notification, screen, nativeTheme } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, Notification, Tray, nativeImage, screen, nativeTheme, systemPreferences } = require('electron')
 const path = require('path')
 const fs = require('fs')
 
@@ -26,6 +26,8 @@ const DEFAULTS = {
   opacity: 1,
   idleOpacity: 0.4,
   lastMinutes: 25,
+  menuBar: false,          // live in the menu bar / system tray instead of floating
+  trayTime: true,          // macOS: show the time left beside the menu bar ring
   bounds: null
 }
 
@@ -124,11 +126,15 @@ function createTimerWindow () {
     maximizable: false,
     fullscreenable: false,
     skipTaskbar: true,
+    show: false,               // shown once loaded, and not at all in the menu bar
     acceptFirstMouse: true,    // a click lands even when the window is not focused
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      // In the menu bar this window is hidden but still runs the countdown, and
+      // Chromium would otherwise slow a hidden page's timers to a crawl.
+      backgroundThrottling: false
     }
   })
 
@@ -140,7 +146,7 @@ function createTimerWindow () {
   timerWin.setAlwaysOnTop(true, 'screen-saver')
   if (IS_MAC) timerWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
-  timerWin.once('ready-to-show', () => timerWin.showInactive())
+  timerWin.once('ready-to-show', () => { if (!settings.menuBar) timerWin.showInactive() })
 
   const rememberBounds = () => {
     if (!timerWin || timerWin.isDestroyed()) return
@@ -149,6 +155,20 @@ function createTimerWindow () {
     persistSettings()
   }
   timerWin.on('moved', rememberBounds)
+
+  // The countdown lives in this page, so if its renderer dies the run dies with
+  // it, and the menu bar would sit frozen on its last reading. Reload it; the
+  // new page picks the run back up from what the old one last reported.
+  let crashes = []
+  timerWin.webContents.on('render-process-gone', (_e, details) => {
+    console.error('timer page gone:', details.reason, details.exitCode)
+    if (details.reason === 'clean-exit' || !timerWin || timerWin.isDestroyed()) return
+    const now = Date.now()
+    crashes = crashes.filter(t => now - t < 60000)
+    crashes.push(now)
+    if (crashes.length > 3) return   // crashing on load; reloading again will not help
+    timerWin.webContents.reload()
+  })
   timerWin.on('closed', () => { timerWin = null })
 }
 
@@ -216,6 +236,8 @@ ipcMain.handle('settings:set', (_e, patch) => {
   persistSettings()
   if (sizeChanged) applyWindowSize()
   if ('lang' in patch) applyLanguage()
+  if ('menuBar' in patch) applyPlacement()
+  if ('trayTime' in patch) paintTray()
   broadcast('settings:changed', settings)
   return settings
 })
@@ -249,7 +271,7 @@ ipcMain.on('window:ignore-mouse', (_e, ignore) => {
 })
 
 ipcMain.on('window:raise', () => {
-  if (!timerWin || timerWin.isDestroyed()) return
+  if (!timerWin || timerWin.isDestroyed() || settings.menuBar) return
   timerWin.setAlwaysOnTop(true, 'screen-saver')
   timerWin.showInactive()
 })
@@ -360,6 +382,7 @@ ipcMain.on('menu:show', () => {
         broadcast('settings:changed', settings)
       }
     },
+    { label: L(IS_MAC ? 'menu.toTray' : 'menu.toTrayWin'), click: () => setMenuBar(true) },
     { type: 'separator' },
     {
       label: L('menu.size'),
@@ -412,6 +435,233 @@ function applyLanguage () {
   if (historyWin && !historyWin.isDestroyed()) historyWin.setTitle(L('win.history'))
 }
 
+// ---------------------------------------------------------------- menu bar
+// The timer can live in the menu bar (the notification area on Windows) rather
+// than float on the desktop. The floating window stays loaded, only hidden, so
+// the countdown itself never changes hands: it reports its state here and the
+// tray just draws it.
+const TRAY_PRESETS = [5, 10, 15, 20, 25, 30, 45, 60]
+const ICON_PT = IS_MAC ? 18 : 16
+
+let tray = null
+let timerState = { state: 'idle', remainingMs: 0, minutes: settings.lastMinutes || 25, endAt: 0 }
+let trayKey = ''          // what the icon last showed, so it is redrawn only on change
+let blinkTimer = null
+let blinkOn = false
+let menuTimer = null      // a single click's menu, held back in case a second click follows
+
+// The dial as a ring with the remaining sector inside it, rasterised by hand
+// because the main process has no canvas. macOS gets a black template image and
+// tints it to suit the menu bar; Windows has to pick black or white itself.
+function trayTone () {
+  if (IS_MAC) return 0
+  const dark = nativeTheme.shouldUseDarkColorsForSystemIntegratedUI ?? nativeTheme.shouldUseDarkColors
+  return dark ? 255 : 0
+}
+
+function ringBitmap (minutes, alpha, scale) {
+  const n = ICON_PT * scale
+  const buf = Buffer.alloc(n * n * 4)
+  const c = n / 2
+  const ringW = 1.4 * scale
+  const ringR = c - 1 * scale - ringW / 2
+  const secR = ringR - ringW / 2 - 1.2 * scale
+  const sweep = Math.max(0, Math.min(60, minutes)) * 6
+  const tone = trayTone()
+  const SS = 4            // samples per axis, for antialiasing
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      let ring = 0
+      let sec = 0
+      for (let sy = 0; sy < SS; sy++) {
+        for (let sx = 0; sx < SS; sx++) {
+          const dx = x + (sx + 0.5) / SS - c
+          const dy = y + (sy + 0.5) / SS - c
+          const r = Math.hypot(dx, dy)
+          if (Math.abs(r - ringR) <= ringW / 2) ring++
+          else if (r <= secR && sweep > 0) {
+            // 0 at twelve o'clock, growing clockwise, like the dial
+            const a = (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360
+            if (sweep >= 360 || a < sweep) sec++
+          }
+        }
+      }
+      const a = Math.round(Math.min(1, (ring + sec * alpha) / (SS * SS)) * 255)
+      const i = (y * n + x) * 4
+      const v = Math.round(tone * a / 255)   // premultiplied
+      buf[i] = v
+      buf[i + 1] = v
+      buf[i + 2] = v
+      buf[i + 3] = a
+    }
+  }
+  return buf
+}
+
+function ringImage (minutes, alpha) {
+  const img = nativeImage.createFromBitmap(ringBitmap(minutes, alpha, 1),
+    { width: ICON_PT, height: ICON_PT, scaleFactor: 1 })
+  img.addRepresentation({
+    scaleFactor: 2, width: ICON_PT * 2, height: ICON_PT * 2, buffer: ringBitmap(minutes, alpha, 2)
+  })
+  if (IS_MAC) img.setTemplateImage(true)
+  return img
+}
+
+function fmt (ms) {
+  const total = Math.ceil(ms / 1000)
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
+function paintTray () {
+  if (!tray) return
+  const { state, remainingMs, minutes } = timerState
+  let shown
+  if (state === 'finished') shown = blinkTimer && blinkOn ? 60 : 0
+  else if (state === 'idle') shown = minutes
+  else shown = remainingMs / 60000
+  // a paused run keeps its sector but greys it out
+  const alpha = state === 'paused' ? 0.4 : 1
+  const key = `${Math.round(shown * 6)}|${alpha}|${trayTone()}`
+  if (key !== trayKey) {
+    trayKey = key
+    tray.setImage(ringImage(shown, alpha))
+  }
+  // the same reading the floating dial shows: the set duration while idle
+  const text = state === 'idle' ? fmt(minutes * 60000) : fmt(state === 'finished' ? 0 : remainingMs)
+  if (IS_MAC) tray.setTitle(settings.trayTime ? text : '', { fontType: 'monospacedDigit' })
+  tray.setToolTip(`Sweep  ${text}\n${t(settings.lang, 'tray.dblHint')}`)
+}
+
+// The floating dial flashes for ten seconds when a run ends; the ring does too.
+function startBlink () {
+  stopBlink()
+  let n = 0
+  blinkOn = true
+  blinkTimer = setInterval(() => {
+    blinkOn = !blinkOn
+    if (++n >= 20) stopBlink()
+    paintTray()
+  }, 500)
+}
+
+function stopBlink () {
+  clearInterval(blinkTimer)
+  blinkTimer = null
+}
+
+function sendTimer (action, extra) {
+  if (timerWin && !timerWin.isDestroyed()) timerWin.webContents.send('timer:command', { action, ...extra })
+}
+
+function trayMenu () {
+  const L = (key, vars) => t(settings.lang, key, vars)
+  const { state, minutes } = timerState
+  const items = [
+    { label: L(state === 'running' ? 'btn.pause' : 'btn.start'), click: () => sendTimer('toggle') },
+    { label: L('btn.reset'), enabled: state !== 'idle', click: () => sendTimer('reset') },
+    {
+      label: L('tray.duration'),
+      submenu: TRAY_PRESETS.map(m => ({
+        label: L('unit.min', { m }),
+        type: 'radio',
+        checked: m === minutes,
+        click: () => sendTimer('set', { minutes: m })
+      }))
+    },
+    { type: 'separator' }
+  ]
+  // Windows tray icons cannot carry text, so there is nothing to switch there.
+  if (IS_MAC) {
+    items.push({
+      label: L('tray.showTime'),
+      type: 'checkbox',
+      checked: !!settings.trayTime,
+      click: () => {
+        settings.trayTime = !settings.trayTime
+        persistSettings()
+        paintTray()
+        broadcast('settings:changed', settings)
+      }
+    }, { type: 'separator' })
+  }
+  if (recoverable) {
+    items.push({ label: L('recover', { m: recoverable.minutes }), click: () => sendTimer('recover') },
+      { type: 'separator' })
+  }
+  items.push(
+    { label: L('menu.toFloat'), click: () => setMenuBar(false) },
+    { label: L('menu.history'), click: openHistory },
+    { label: L('menu.settings'), click: openSettings },
+    { type: 'separator' },
+    { label: L('menu.quit'), click: () => app.quit() }
+  )
+  return Menu.buildFromTemplate(items)
+}
+
+// How long a single click waits to see whether it is half of a double-click.
+// The system setting (0.5s by default on macOS) is honoured up to a point, past
+// which waiting for the menu starts to feel like lag.
+function doubleClickMs () {
+  const sys = IS_MAC ? systemPreferences.getUserDefault('com.apple.mouse.doubleClickThreshold', 'double') : 0
+  return Math.min(350, sys > 0 ? sys * 1000 : 350)
+}
+
+function createTray () {
+  tray = new Tray(ringImage(timerState.minutes, 1))
+  trayKey = ''
+  const pop = () => { if (tray) tray.popUpContextMenu(trayMenu()) }
+  // A double-click floats the timer again. The menu would swallow the second
+  // click if it were already open, so a single click waits before opening it.
+  tray.on('click', () => {
+    clearTimeout(menuTimer)
+    menuTimer = setTimeout(pop, doubleClickMs())
+  })
+  tray.on('double-click', () => {
+    clearTimeout(menuTimer)
+    setMenuBar(false)
+  })
+  tray.on('right-click', pop)
+  paintTray()
+}
+
+function applyPlacement () {
+  if (settings.menuBar) {
+    if (!tray) createTray()
+    if (timerWin && !timerWin.isDestroyed()) timerWin.hide()
+  } else {
+    clearTimeout(menuTimer)
+    if (tray) {
+      tray.destroy()
+      tray = null
+    }
+    stopBlink()
+    if (timerWin && !timerWin.isDestroyed()) timerWin.showInactive()
+  }
+}
+
+function setMenuBar (on) {
+  settings.menuBar = on
+  persistSettings()
+  applyPlacement()
+  broadcast('settings:changed', settings)
+}
+
+// Only a run in progress is worth handing to a reloaded page.
+ipcMain.handle('timer:get', () =>
+  timerState.state === 'running' || timerState.state === 'paused' ? timerState : null)
+
+ipcMain.on('timer:state', (_e, s) => {
+  const justFinished = s.state === 'finished' && timerState.state !== 'finished'
+  timerState = s
+  if (justFinished && tray) startBlink()
+  else if (s.state !== 'finished') stopBlink()
+  paintTray()
+})
+
+// Windows draws the ring black or white to suit the taskbar, which can change.
+nativeTheme.on('updated', paintTray)
+
 // ---------------------------------------------------------------- lifecycle
 app.whenReady().then(() => {
   if (IS_MAC) app.dock.hide()
@@ -423,6 +673,7 @@ app.whenReady().then(() => {
   }
   applyLanguage()
   createTimerWindow()
+  if (settings.menuBar) createTray()
 })
 
 app.on('window-all-closed', () => app.quit())

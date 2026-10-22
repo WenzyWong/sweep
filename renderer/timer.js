@@ -37,6 +37,25 @@ class Timer extends EventTarget {
     return this.state === 'idle' ? this.minutes : this.remainingMs / 60000
   }
 
+  // Pick up a run reported by an earlier copy of this page, which the main
+  // process kept when that page crashed and had to be reloaded.
+  restore ({ state, minutes, remainingMs, endAt }) {
+    clearTimeout(this._tick)
+    this.minutes = Math.max(1, Math.min(60, minutes))
+    if (state === 'running') {
+      this._endAt = endAt
+      this.state = 'running'
+      this._loop()               // a deadline that passed meanwhile finishes at once
+    } else if (state === 'paused') {
+      this.remainingMs = remainingMs
+      this.state = 'paused'
+    } else {
+      this.state = 'idle'
+      this.remainingMs = this.minutes * 60000
+    }
+    this.emit('change')
+  }
+
   start () {
     if (this.state === 'running') return
     if (this.state === 'finished') this.reset()

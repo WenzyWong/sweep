@@ -9,6 +9,7 @@ un secteur coloré revient vers zéro, et le cadran clignote quand le temps est 
 
 - Flotte au-dessus de toutes les fenêtres. Sur macOS cela couvre tous les Spaces, y compris ceux en plein écran d'autres apps ; Windows n'a pas d'équivalent, la fenêtre reste sur le bureau virtuel où elle a été ouverte
 - Deux apparences : le boîtier complet avec ses boutons, ou le cadran seul pour un minimum de distraction
+- Ou rangez-le dans la barre des menus (la zone de notification sous Windows) : un petit cadran qui suit le compte à rebours, avec le temps restant à côté si vous le souhaitez. Un clic ouvre le menu, un double-clic le remet sur le bureau
 - Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs ; le cadran prend chaque couleur au moment où vous la choisissez, avant même d'enregistrer
 - Réglez la durée en faisant tourner le cadran ou en saisissant les minutes (1–60)
 - Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours. Une séance interrompue par une fermeture ou un plantage est proposée à l'enregistrement au lancement suivant
@@ -54,6 +55,8 @@ npm start
 | Remettre à zéro | Cliquez sur le bouton rond en haut ; en mode cadran seul, double-cliquez sur le bouton central |
 | Déplacer | Faites glisser le boîtier ou la couronne graduée, ou ⌘/Ctrl-glissez n'importe où |
 | Tout le reste | Clic droit : mode, taille, couleurs, langue, historique, réglages, quitter |
+| Barre des menus | Clic droit → « Placer dans la barre des menus », ou cochez l'option dans Apparence des réglages |
+| Depuis la barre des menus | Cliquez sur le cadran pour le menu : démarrer / pause, remise à zéro, durée, temps restant. Double-cliquez pour le remettre sur le bureau |
 
 L'app n'apparaît ni dans le Dock ni dans la barre des tâches : quittez-la depuis
 le menu contextuel (ou avec ⌘Q / Ctrl+Q lorsqu'une fenêtre a le focus).

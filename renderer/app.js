@@ -204,6 +204,20 @@ function reportRun () {
 }
 timer.addEventListener('change', reportRun)
 
+// The menu bar ring is drawn by the main process from what is reported here.
+// Once a second is plenty: the icon is far too small to show finer movement.
+let reportedState = ''
+let restored = false      // until then, an idle report would clobber the run being restored
+function reportState () {
+  if (!restored) return
+  const secs = timer.state === 'idle' ? timer.minutes * 60 : Math.ceil(timer.remainingMs / 1000)
+  const key = `${timer.state}|${timer.minutes}|${secs}`
+  if (key === reportedState) return
+  reportedState = key
+  api.reportTimer({ state: timer.state, remainingMs: timer.remainingMs, minutes: timer.minutes, endAt: timer.endAt })
+}
+timer.addEventListener('change', reportState)
+
 // ---------------------------------------------------------------- finishing
 function stopFlash () {
   clearTimeout(flashTimer)
@@ -316,6 +330,26 @@ hub.addEventListener('dblclick', e => {
   stopFlash()
   dismissAgain()
   timer.reset()
+})
+
+// The menu bar menu drives the same timer the dial does, from the main process.
+api.onTimerCommand(({ action, minutes }) => {
+  stopFlash()
+  if (action === 'recover') {
+    if (!recoverPending) return
+    recoverPending = false
+    againBtn.hidden = true
+    api.recover(true)
+    return
+  }
+  dismissAgain()
+  if (action === 'toggle') timer.toggle()
+  else if (action === 'reset') timer.reset()
+  else if (action === 'set') {
+    setMinutesAnnounced(minutes)
+    if (timer.state !== 'running') timer.reset()
+    rememberMinutes()
+  }
 })
 
 // ---------------------------------------------------------------- dragging
@@ -460,7 +494,14 @@ window.addEventListener('contextmenu', e => {
 
 // ---------------------------------------------------------------- boot
 api.onSettingsChanged(applySettings)
-api.getSettings().then(applySettings)
+api.getSettings().then(async s => {
+  applySettings(s)
+  // non-null only when this page is a reload after the previous one crashed
+  const run = await api.getTimerState()
+  if (run) timer.restore(run)
+  restored = true
+  reportState()
+})
 
 // A run whose clock ran out while the app was not there to notice it
 api.getRecoverable().then(pending => {

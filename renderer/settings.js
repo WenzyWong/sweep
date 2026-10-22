@@ -132,6 +132,16 @@ window.addEventListener('beforeunload', clearPreview)
 $('mode-toggle').addEventListener('click', () =>
   api.setSettings({ mode: settings.mode === 'full' ? 'dial' : 'full' }))
 
+$('menu-bar').addEventListener('change', e => api.setSettings({ menuBar: e.target.checked }))
+$('tray-time').addEventListener('change', e => api.setSettings({ trayTime: e.target.checked }))
+
+// Windows calls it the system tray, and its tray icons cannot carry text.
+if (api.platform !== 'darwin') {
+  $('tray-label').dataset.i18n = 'appearance.trayWin'
+  $('tray-hint').dataset.i18n = 'appearance.trayHintWin'
+  $('tray-time-row').remove()
+}
+
 $('size').addEventListener('input', e => {
   const v = parseInt(e.target.value, 10)
   $('size-label').textContent = v + ' px'
@@ -187,6 +197,11 @@ function apply (s) {
   checkContrast()
 
   $('mode-toggle').textContent = L(s.mode === 'full' ? 'mode.full' : 'mode.dial')
+  $('menu-bar').checked = !!s.menuBar
+  if ($('tray-time')) {
+    $('tray-time').checked = !!s.trayTime
+    $('tray-time').disabled = !s.menuBar
+  }
   $('size').value = s.sizeUnit
   $('size-label').textContent = s.sizeUnit + ' px'
   if (document.activeElement !== $('quote')) $('quote').value = s.quote || ''
