@@ -12,7 +12,8 @@ a colour sector sweeps back to zero, and the face flashes when time is up.
 - Or tuck it into the menu bar (the system tray on Windows): a small dial that sweeps in step with the countdown, with the time left beside it if you want it. Click for the menu, double-click to float it on the desktop again
 - Six colourways from the reference timer, plus fully custom four-colour schemes; the dial takes each colour as you pick it, so you can judge it before saving
 - Set the time by dragging the dial or by typing minutes (1–60)
-- Every completed run is logged; the history window shows the day's rings and the last 30 days. A run cut short by a quit or a crash is offered for logging on the next launch
+- Every completed run is logged; the history window shows the day's rings and the last 30 days. A run cut short by a quit or a crash is offered for logging on the next launch. The run in progress shows there too, with the time it has run so far (what is still on the clock is not counted)
+- Done early? Hold the start / pause button to end the run and log only the minutes that have run (under a minute is not logged)
 - Adjustable opacity, set separately for running and idle; hovering always brings it back to solid
 - Buttons click, reset sweeps, and a soft note marks the end
 - Traditional Chinese, Simplified Chinese, Japanese, English and French, picked up from the system locale on first launch
@@ -56,7 +57,8 @@ npm start
 | Move it | Drag the case or the dial's outer ring, or ⌘/Ctrl-drag anywhere |
 | Everything else | Right-click: mode, size, colours, language, history, settings, quit |
 | Move to the menu bar | Right-click → **Move to menu bar**, or tick it under Appearance in Settings |
-| In the menu bar | Click the dial for the menu: start / pause, reset, set time, show time left. Double-click to float it again |
+| End early and log | Hold the long button on top; in bare-dial mode, hold the centre knob; in the menu bar, choose **End and log** |
+| In the menu bar | Click the dial for the menu: start / pause, end and log, reset, set time, show time left. Double-click to float it again |
 
 The app stays out of the Dock and the taskbar, so quit from the right-click
 menu (or ⌘Q / Ctrl+Q while a window is focused).

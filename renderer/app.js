@@ -130,9 +130,13 @@ function renderTip () {
   tipMain.textContent = tipFor === 'reset'
     ? L('btn.reset')
     : L(timer.state === 'running' ? 'btn.pause' : 'btn.start')
-  // only the bare-dial knob carries a second gesture worth explaining
-  tipHint.textContent = tipFor === 'knob' ? L('tip.knobHint') : ''
-  tipHint.hidden = tipFor !== 'knob'
+  // the bare-dial knob carries a second gesture worth explaining, and any
+  // start/pause control a third while there is a run to end
+  const hints = []
+  if (tipFor === 'knob') hints.push(L('tip.knobHint'))
+  if (tipFor !== 'reset' && (timer.state === 'running' || timer.state === 'paused')) hints.push(L('tip.holdHint'))
+  tipHint.textContent = hints.join(' · ')
+  tipHint.hidden = !hints.length
 }
 
 // Centre the pill on the control being hovered, keep it inside the window,
@@ -278,7 +282,66 @@ function press (kind) {
   else window.playClick()
 }
 
+// ---------------------------------------------------------------- ending early
+// Holding the start/pause control down ends the run there and then, and logs
+// the part that has already run. Less than a whole minute is not logged.
+const HOLD_MS = 650
+let hold = null           // { el, timer } while a press is being held
+let holdFired = false     // swallows the click that follows a completed hold
+
+function endRunEarly () {
+  stopFlash()
+  dismissAgain()
+  const m = Math.floor(timer.stop() / 60000)
+  press('sweep')
+  if (m >= 1) {
+    api.addSession(m, true)
+    showNotice(L('stopped', { m }))
+  } else {
+    showNotice(L('stopped.short'))
+  }
+}
+
+function cancelHold () {
+  if (!hold) return
+  clearTimeout(hold.timer)
+  hold.el.classList.remove('holding')
+  hold = null
+}
+
+function armHold (el) {
+  el.addEventListener('mousedown', e => {
+    if (e.button !== 0) return
+    holdFired = false
+    cancelHold()
+    if (timer.state !== 'running' && timer.state !== 'paused') return
+    el.classList.add('holding')
+    hold = {
+      el,
+      timer: setTimeout(() => {
+        cancelHold()
+        holdFired = true
+        // a pending single click on the bare-dial knob must not fire either
+        clearTimeout(hubClickTimer)
+        hubClickTimer = null
+        endRunEarly()
+      }, HOLD_MS)
+    }
+  })
+  el.addEventListener('mouseleave', cancelHold)
+}
+window.addEventListener('mouseup', cancelHold)
+
+// true when this click is the release of a hold that already ended the run
+function swallowHeldClick (e) {
+  if (!holdFired) return false
+  holdFired = false
+  e.stopPropagation()
+  return true
+}
+
 document.querySelector('.btn-bar').addEventListener('click', e => {
+  if (swallowHeldClick(e)) return
   e.stopPropagation()
   press('click')
   stopFlash()
@@ -304,7 +367,11 @@ function hubToggle () {
   timer.toggle()
 }
 
+armHold(btnBar)
+armHold(hub)
+
 hub.addEventListener('click', e => {
+  if (swallowHeldClick(e)) return
   e.stopPropagation()
   // In full-body mode the round button on top already resets, so the knob can
   // act at once. In bare-dial mode it has to carry both actions, which means
@@ -343,6 +410,7 @@ api.onTimerCommand(({ action, minutes }) => {
     return
   }
   dismissAgain()
+  if (action === 'stop') { endRunEarly(); return }
   if (action === 'toggle') timer.toggle()
   else if (action === 'reset') timer.reset()
   else if (action === 'set') {

@@ -70,6 +70,12 @@ body.previewing #stage { opacity: 1; }
   height: 100%;
   border-radius: calc(var(--unit) * 0.02) calc(var(--unit) * 0.02) 0 0;
 }
+.btn-bar.holding {
+  /* darkens over the hold, so it is clear something is about to happen */
+  transition: transform .12s ease, filter .65s linear;
+  filter: brightness(.72);
+  transform: translateY(8%);
+}
 .btn-round {
   right: 14%;
   width: var(--nub);
@@ -188,7 +194,9 @@ body.tiny .tip { display: none; }
   fill: var(--knob);
   cursor: pointer;
   filter: drop-shadow(0 .6px 1px rgba(0,0,0,.28));
+  transition: opacity .12s ease;
 }
+.hub.holding { opacity: .55; transition: opacity .65s linear; }
 
 .tick { stroke: var(--ink); }
 .tick.major { stroke-width: .9; opacity: .75; }

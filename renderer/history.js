@@ -6,6 +6,8 @@ const L = (key, vars) => window.t(settings ? settings.lang : 'en', key, vars)
 let history = {}
 let settings = null
 let selected = todayKey()
+let live = null           // the run on the dial right now, if one is going
+let liveTick = null
 
 function pad (n) { return String(n).padStart(2, '0') }
 function keyOf (d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` }
@@ -43,6 +45,34 @@ function ringSVG (minutes, color, track) {
   </svg>`
 }
 
+// How much of the run on the dial has already swept past. What is still left
+// on the clock is not counted, and none of it is in the totals until it is logged.
+function liveElapsedMs () {
+  if (!live) return 0
+  const full = live.minutes * 60000
+  if (live.state === 'running') return Math.max(0, full - Math.max(0, live.endAt - Date.now()))
+  if (live.state === 'paused') return Math.max(0, full - live.remainingMs)
+  return 0
+}
+
+function clock (ms) {
+  const total = Math.floor(ms / 1000)
+  const h = Math.floor(total / 3600)
+  const m = Math.floor(total / 60) % 60
+  const sec = pad(total % 60)
+  return h ? `${h}:${pad(m)}:${sec}` : `${m}:${sec}`
+}
+
+function liveRingHTML (color) {
+  const ms = liveElapsedMs()
+  const key = live.state === 'paused' ? 'live.paused' : 'live'
+  return `<div class="ring live${live.state === 'paused' ? ' paused' : ''}"
+               title="${L(key, { t: clock(ms) })}">
+      ${ringSVG(ms / 60000, color, 'rgba(128,128,128,.18)')}
+      <span class="mins">${clock(ms)}</span>
+    </div>`
+}
+
 function render () {
   if (!settings) return
   const scheme = window.findScheme(settings.schemeId, settings.customSchemes)
@@ -62,13 +92,20 @@ function render () {
     ? L(key, { n: `<b>${sessions.length}</b>`, m: `<b>${total}</b>` })
     : '\u3000'
 
-  $('empty').hidden = sessions.length > 0
+  const showLive = !!live && selected === todayKey()
+  $('live').hidden = !showLive
+  if (showLive) {
+    $('live').textContent = L(live.state === 'paused' ? 'live.paused' : 'live', { t: clock(liveElapsedMs()) })
+  }
+
+  $('empty').hidden = sessions.length > 0 || showLive
   $('rings').innerHTML = sessions.map(s => {
-    return `<div class="ring" title="${clockTime(s.t)}　${L('unit.min', { m: s.m })}">
+    const note = s.p ? `　${L('partial')}` : ''
+    return `<div class="ring${s.p ? ' partial' : ''}" title="${clockTime(s.t)}　${L('unit.min', { m: s.m })}${note}">
       ${ringSVG(s.m, scheme.sector, 'rgba(128,128,128,.18)')}
       <span class="mins">${s.m}</span>
     </div>`
-  }).join('')
+  }).join('') + (showLive ? liveRingHTML(scheme.sector) : '')
 
   renderHeat(scheme.sector)
 }
@@ -98,11 +135,20 @@ $('heat').addEventListener('click', e => {
   if (cell) { selected = cell.dataset.key; render() }
 })
 
+// A paused run does not move, so only a running one needs redrawing each second.
+function setLive (s) {
+  live = s && (s.state === 'running' || s.state === 'paused') ? s : null
+  clearInterval(liveTick)
+  liveTick = live && live.state === 'running' ? setInterval(render, 1000) : null
+  render()
+}
+
 api.onHistoryChanged(h => { history = h; render() })
+api.onTimerLive(setLive)
 api.onSettingsChanged(s => { settings = s; render() })
 
-Promise.all([api.getHistory(), api.getSettings()]).then(([h, s]) => {
+Promise.all([api.getHistory(), api.getSettings(), api.getTimerState()]).then(([h, s, run]) => {
   history = h
   settings = s
-  render()
+  setLive(run)
 })

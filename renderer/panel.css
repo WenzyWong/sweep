@@ -167,6 +167,18 @@ button:disabled { opacity: .45; cursor: default; }
   font-variant-numeric: tabular-nums;
 }
 
+.summary:has(+ .live-line:not([hidden])) { margin-bottom: 4px; }
+.live-line {
+  color: var(--accent);
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+/* the run still going: drawn lighter, and marked out from the finished ones */
+.ring.live svg { opacity: .55; }
+.ring.live .mins { color: var(--accent); font-size: 9px; }
+.ring.live.paused svg { opacity: .3; }
+
 .empty {
   color: var(--dim);
   text-align: center;

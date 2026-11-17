@@ -296,11 +296,12 @@ function dateKey (ts) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
-ipcMain.handle('history:add', (_e, { minutes }) => {
+ipcMain.handle('history:add', (_e, { minutes, partial }) => {
   const now = Date.now()
   const key = dateKey(now)
   if (!history[key]) history[key] = []
-  history[key].push({ t: now, m: minutes })
+  // p marks a run that was ended early: m is then only the part that had run
+  history[key].push(partial ? { t: now, m: minutes, p: 1 } : { t: now, m: minutes })
   writeJSON(historyFile, history)
   broadcast('history:changed', history)
   return history
@@ -554,11 +555,27 @@ function sendTimer (action, extra) {
   if (timerWin && !timerWin.isDestroyed()) timerWin.webContents.send('timer:command', { action, ...extra })
 }
 
+// The part of the current countdown that has already run, as the dial reports it.
+function elapsedMs (s) {
+  const full = s.minutes * 60000
+  if (s.state === 'running') return Math.max(0, full - Math.max(0, s.endAt - Date.now()))
+  if (s.state === 'paused') return Math.max(0, full - s.remainingMs)
+  return 0
+}
+
 function trayMenu () {
   const L = (key, vars) => t(settings.lang, key, vars)
   const { state, minutes } = timerState
+  const active = state === 'running' || state === 'paused'
+  const done = Math.floor(elapsedMs(timerState) / 60000)
   const items = [
     { label: L(state === 'running' ? 'btn.pause' : 'btn.start'), click: () => sendTimer('toggle') },
+    // the menu's stand-in for holding the start/pause button down
+    {
+      label: active && done < 1 ? L('tray.stopShort') : L('tray.stop', { m: done }),
+      enabled: active,
+      click: () => sendTimer('stop')
+    },
     { label: L('btn.reset'), enabled: state !== 'idle', click: () => sendTimer('reset') },
     {
       label: L('tray.duration'),
@@ -657,6 +674,8 @@ ipcMain.on('timer:state', (_e, s) => {
   if (justFinished && tray) startBlink()
   else if (s.state !== 'finished') stopBlink()
   paintTray()
+  // the history window shows the run in progress next to the finished ones
+  if (historyWin && !historyWin.isDestroyed()) historyWin.webContents.send('timer:live', s)
 })
 
 // Windows draws the ring black or white to suit the taskbar, which can change.

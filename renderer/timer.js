@@ -37,6 +37,16 @@ class Timer extends EventTarget {
     return this.state === 'idle' ? this.minutes : this.remainingMs / 60000
   }
 
+  // How much of the current countdown has already swept past, in ms. Only the
+  // part that has actually run counts; what is still on the clock does not.
+  get elapsedMs () {
+    const full = this.minutes * 60000
+    if (this.state === 'running') return Math.max(0, full - Math.max(0, this._endAt - Date.now()))
+    if (this.state === 'paused') return Math.max(0, full - this.remainingMs)
+    if (this.state === 'finished') return full
+    return 0
+  }
+
   // Pick up a run reported by an earlier copy of this page, which the main
   // process kept when that page crashed and had to be reloaded.
   restore ({ state, minutes, remainingMs, endAt }) {
@@ -77,6 +87,15 @@ class Timer extends EventTarget {
   toggle () {
     if (this.state === 'running') this.pause()
     else this.start()
+  }
+
+  // End the run early, keeping what has run so far. Returns that, in ms; the
+  // caller decides whether it is worth logging.
+  stop () {
+    if (this.state !== 'running' && this.state !== 'paused') return 0
+    const elapsed = this.elapsedMs
+    this.reset()
+    return elapsed
   }
 
   reset () {

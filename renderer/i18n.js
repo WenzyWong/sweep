@@ -15,6 +15,8 @@ const STRINGS = {
 
     'btn.start': '開始', 'btn.pause': '暫停', 'btn.reset': '重置',
     'tip.knobHint': '雙擊重置',
+    'tip.holdHint': '長按結束並記錄',
+    'stopped': '已記錄走完的 {m} 分鐘', 'stopped.short': '未滿 1 分鐘，不記錄',
     'again': '↻ 再 {m} 分鐘',
     'recover': '補記 {m} 分鐘？', 'retimed': '已重設為 {m} 分鐘',
 
@@ -27,6 +29,7 @@ const STRINGS = {
     'size.small': '小', 'size.medium': '中', 'size.large': '大', 'size.xlarge': '特大',
     'menu.edit': '編輯',
     'menu.toTray': '收進選單列', 'menu.toTrayWin': '收進系統匣', 'menu.toFloat': '回到桌面懸浮',
+    'tray.stop': '結束並記錄已走的 {m} 分鐘', 'tray.stopShort': '結束（未滿 1 分鐘，不記錄）',
     'tray.duration': '設定時間', 'tray.showTime': '顯示剩餘時間', 'tray.dblHint': '雙擊回到桌面懸浮',
 
     'settings.title': '設定',
@@ -54,6 +57,7 @@ const STRINGS = {
     'nav.prev': '前一天', 'nav.next': '後一天', 'nav.today': '今天',
     'summary': '{n} 次專注　·　共 {m} 分鐘',
     'empty.1': '這天還沒有完成的倒數。', 'empty.2': '走完一輪就會在這裡留下一枚圓環。',
+    'live': '進行中　·　已走 {t}', 'live.paused': '已暫停　·　已走 {t}', 'partial': '提前結束',
     'heat.title': '近 30 天',
     'unit.min': '{m} 分鐘'
   },
@@ -65,6 +69,8 @@ const STRINGS = {
 
     'btn.start': '开始', 'btn.pause': '暂停', 'btn.reset': '重置',
     'tip.knobHint': '双击重置',
+    'tip.holdHint': '长按结束并记录',
+    'stopped': '已记录走完的 {m} 分钟', 'stopped.short': '不足 1 分钟，不记录',
     'again': '↻ 再 {m} 分钟',
     'recover': '补记 {m} 分钟？', 'retimed': '已重设为 {m} 分钟',
 
@@ -77,6 +83,7 @@ const STRINGS = {
     'size.small': '小', 'size.medium': '中', 'size.large': '大', 'size.xlarge': '特大',
     'menu.edit': '编辑',
     'menu.toTray': '收进菜单栏', 'menu.toTrayWin': '收进系统托盘', 'menu.toFloat': '回到桌面悬浮',
+    'tray.stop': '结束并记录已走的 {m} 分钟', 'tray.stopShort': '结束（不足 1 分钟，不记录）',
     'tray.duration': '设置时间', 'tray.showTime': '显示剩余时间', 'tray.dblHint': '双击回到桌面悬浮',
 
     'settings.title': '设置',
@@ -104,6 +111,7 @@ const STRINGS = {
     'nav.prev': '前一天', 'nav.next': '后一天', 'nav.today': '今天',
     'summary': '{n} 次专注　·　共 {m} 分钟',
     'empty.1': '这天还没有完成的倒计时。', 'empty.2': '走完一轮就会在这里留下一枚圆环。',
+    'live': '进行中　·　已走 {t}', 'live.paused': '已暂停　·　已走 {t}', 'partial': '提前结束',
     'heat.title': '近 30 天',
     'unit.min': '{m} 分钟'
   },
@@ -115,6 +123,8 @@ const STRINGS = {
 
     'btn.start': '開始', 'btn.pause': '一時停止', 'btn.reset': 'リセット',
     'tip.knobHint': 'ダブルクリックでリセット',
+    'tip.holdHint': '長押しで終了して記録',
+    'stopped': '経過した {m} 分を記録しました', 'stopped.short': '1 分未満のため記録しません',
     'again': '↻ もう {m} 分',
     'recover': '{m} 分を記録しますか？', 'retimed': '{m} 分に設定し直しました',
 
@@ -127,6 +137,7 @@ const STRINGS = {
     'size.small': '小', 'size.medium': '中', 'size.large': '大', 'size.xlarge': '特大',
     'menu.edit': '編集',
     'menu.toTray': 'メニューバーに収納', 'menu.toTrayWin': '通知領域に収納', 'menu.toFloat': 'デスクトップ表示に戻す',
+    'tray.stop': '終了して経過した {m} 分を記録', 'tray.stopShort': '終了（1 分未満は記録しません）',
     'tray.duration': '時間を設定', 'tray.showTime': '残り時間を表示', 'tray.dblHint': 'ダブルクリックでデスクトップ表示に戻る',
 
     'settings.title': '設定',
@@ -154,6 +165,7 @@ const STRINGS = {
     'nav.prev': '前の日', 'nav.next': '次の日', 'nav.today': '今日',
     'summary': '{n} 回の集中　·　合計 {m} 分',
     'empty.1': 'この日はまだ完了したカウントダウンがありません。', 'empty.2': '一巡すると、ここにリングが残ります。',
+    'live': '計測中　·　経過 {t}', 'live.paused': '一時停止中　·　経過 {t}', 'partial': '途中で終了',
     'heat.title': '直近 30 日',
     'unit.min': '{m} 分'
   },
@@ -165,6 +177,8 @@ const STRINGS = {
 
     'btn.start': 'Start', 'btn.pause': 'Pause', 'btn.reset': 'Reset',
     'tip.knobHint': 'Double-click to reset',
+    'tip.holdHint': 'Hold to end and log',
+    'stopped': 'Logged the {m} min that ran', 'stopped.short': 'Under a minute, not logged',
     'again': '↻ Another {m} min',
     'recover': 'Log the missed {m} min?', 'retimed': 'Restarted at {m} min',
 
@@ -177,6 +191,7 @@ const STRINGS = {
     'size.small': 'Small', 'size.medium': 'Medium', 'size.large': 'Large', 'size.xlarge': 'Extra large',
     'menu.edit': 'Edit',
     'menu.toTray': 'Move to menu bar', 'menu.toTrayWin': 'Move to system tray', 'menu.toFloat': 'Float on desktop again',
+    'tray.stop': 'End and log the {m} min so far', 'tray.stopShort': 'End (under a minute, not logged)',
     'tray.duration': 'Set time', 'tray.showTime': 'Show time left', 'tray.dblHint': 'Double-click to float on the desktop again',
 
     'settings.title': 'Settings',
@@ -205,6 +220,7 @@ const STRINGS = {
     'summary': '{n} sessions  ·  {m} min total',
     'summary.one': '{n} session  ·  {m} min total',
     'empty.1': 'No finished countdowns on this day.', 'empty.2': 'Complete one and a ring appears here.',
+    'live': 'In progress  ·  {t} so far', 'live.paused': 'Paused  ·  {t} so far', 'partial': 'ended early',
     'heat.title': 'Last 30 days',
     'unit.min': '{m} min'
   },
@@ -216,6 +232,8 @@ const STRINGS = {
 
     'btn.start': 'Démarrer', 'btn.pause': 'Pause', 'btn.reset': 'Remettre à zéro',
     'tip.knobHint': 'Double-clic : remise à zéro',
+    'tip.holdHint': 'Maintenir : terminer et enregistrer',
+    'stopped': '{m} min écoulées enregistrées', 'stopped.short': 'Moins d’une minute, rien d’enregistré',
     'again': '↻ Encore {m} min',
     'recover': 'Enregistrer les {m} min manquantes ?', 'retimed': 'Redémarré à {m} min',
 
@@ -228,6 +246,7 @@ const STRINGS = {
     'size.small': 'Petit', 'size.medium': 'Moyen', 'size.large': 'Grand', 'size.xlarge': 'Très grand',
     'menu.edit': 'Édition',
     'menu.toTray': 'Placer dans la barre des menus', 'menu.toTrayWin': 'Placer dans la zone de notification', 'menu.toFloat': 'Revenir sur le bureau',
+    'tray.stop': 'Terminer et enregistrer les {m} min écoulées', 'tray.stopShort': 'Terminer (moins d’une minute, rien d’enregistré)',
     'tray.duration': 'Régler la durée', 'tray.showTime': 'Afficher le temps restant', 'tray.dblHint': 'Double-cliquer pour revenir sur le bureau',
 
     'settings.title': 'Réglages',
@@ -256,6 +275,7 @@ const STRINGS = {
     'summary': '{n} séances  ·  {m} min au total',
     'summary.one': '{n} séance  ·  {m} min au total',
     'empty.1': 'Aucun compte à rebours terminé ce jour-là.', 'empty.2': 'Terminez-en un et un anneau apparaîtra ici.',
+    'live': 'En cours  ·  {t} écoulées', 'live.paused': 'En pause  ·  {t} écoulées', 'partial': 'terminée plus tôt',
     'heat.title': '30 derniers jours',
     'unit.min': '{m} min'
   }

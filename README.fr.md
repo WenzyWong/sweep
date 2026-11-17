@@ -12,7 +12,8 @@ un secteur coloré revient vers zéro, et le cadran clignote quand le temps est 
 - Ou rangez-le dans la barre des menus (la zone de notification sous Windows) : un petit cadran qui suit le compte à rebours, avec le temps restant à côté si vous le souhaitez. Un clic ouvre le menu, un double-clic le remet sur le bureau
 - Six palettes reprises du minuteur d'origine, plus des palettes personnalisées à quatre couleurs ; le cadran prend chaque couleur au moment où vous la choisissez, avant même d'enregistrer
 - Réglez la durée en faisant tourner le cadran ou en saisissant les minutes (1–60)
-- Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours. Une séance interrompue par une fermeture ou un plantage est proposée à l'enregistrement au lancement suivant
+- Chaque séance terminée est enregistrée ; l'historique montre les anneaux du jour et les 30 derniers jours. Une séance interrompue par une fermeture ou un plantage est proposée à l'enregistrement au lancement suivant. La séance en cours y figure aussi, avec le temps déjà écoulé (ce qui reste au cadran n'est pas compté)
+- Fini plus tôt ? Maintenez le bouton démarrer / pause pour terminer la séance et n'enregistrer que les minutes écoulées (moins d'une minute n'est pas enregistrée)
 - Opacité réglable séparément pendant une séance et au repos ; le survol la ramène toujours à l'opacité pleine
 - Les boutons cliquent, la remise à zéro balaie, et une note douce marque la fin
 - Chinois traditionnel, chinois simplifié, japonais, anglais et français, choisis d'après la langue du système au premier lancement
@@ -56,7 +57,8 @@ npm start
 | Déplacer | Faites glisser le boîtier ou la couronne graduée, ou ⌘/Ctrl-glissez n'importe où |
 | Tout le reste | Clic droit : mode, taille, couleurs, langue, historique, réglages, quitter |
 | Barre des menus | Clic droit → « Placer dans la barre des menus », ou cochez l'option dans Apparence des réglages |
-| Depuis la barre des menus | Cliquez sur le cadran pour le menu : démarrer / pause, remise à zéro, durée, temps restant. Double-cliquez pour le remettre sur le bureau |
+| Terminer plus tôt et enregistrer | Maintenez le bouton long du dessus ; en mode cadran seul, maintenez le bouton central ; dans la barre des menus, choisissez **Terminer et enregistrer** |
+| Depuis la barre des menus | Cliquez sur le cadran pour le menu : démarrer / pause, terminer et enregistrer, remise à zéro, durée, temps restant. Double-cliquez pour le remettre sur le bureau |
 
 L'app n'apparaît ni dans le Dock ni dans la barre des tâches : quittez-la depuis
 le menu contextuel (ou avec ⌘Q / Ctrl+Q lorsqu'une fenêtre a le focus).

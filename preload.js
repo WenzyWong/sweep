@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld('api', {
   onSettingsChanged: cb => ipcRenderer.on('settings:changed', (_e, s) => cb(s)),
 
   getHistory: () => ipcRenderer.invoke('history:get'),
-  addSession: minutes => ipcRenderer.invoke('history:add', { minutes }),
+  addSession: (minutes, partial) => ipcRenderer.invoke('history:add', { minutes, partial: !!partial }),
   onHistoryChanged: cb => ipcRenderer.on('history:changed', (_e, h) => cb(h)),
 
   previewScheme: scheme => ipcRenderer.send('preview:scheme', scheme),
@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('api', {
   runCleared: () => ipcRenderer.send('run:cleared'),
   reportTimer: state => ipcRenderer.send('timer:state', state),
   getTimerState: () => ipcRenderer.invoke('timer:get'),
+  onTimerLive: cb => ipcRenderer.on('timer:live', (_e, s) => cb(s)),
   onTimerCommand: cb => ipcRenderer.on('timer:command', (_e, cmd) => cb(cmd)),
 
   getRecoverable: () => ipcRenderer.invoke('run:recoverable'),
